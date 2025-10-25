@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasiski Examination | CipherCraft</title>
+    <style>
+        /* Copied styles from vigenere.html for consistent theme */
+        @font-face {
+          font-family: 'Hack';
+          src: url('./Hack-Regular.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Hack';
+          src: url('./Hack-Bold.ttf') format('truetype');
+          font-weight: bold;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Hack';
+          src: url('./Hack-Italic.ttf') format('truetype');
+          font-weight: normal;
+          font-style: italic;
+        }
+        @font-face {
+          font-family: 'Hack';
+          src: url('./Hack-BoldItalic.ttf') format('truetype');
+          font-weight: bold;
+          font-style: italic;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hack', monospace;
+        }
+        
+        body {
+            background: #0a0a0f;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-bottom: 1px solid #73DD07;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            color: #73DD07;
+            text-shadow: 0 0 10px rgba(16, 252, 85, 0.5);
+        }
+        
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .panel {
+            background: #111111;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1f2937;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #73DD07;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 256px;
+            padding: 15px;
+            background: #222;
+            color: #f8fafc;
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-family: 'Hack', monospace;
+            resize: vertical;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #73DD07;
+            box-shadow: 0 0 10px rgba(16, 252, 85, 0.3);
+        }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: #73DD07;
+            color: #0a0a0f;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Hack', monospace;
+            border: 1px solid #73DD07;
+            font-size: 1.1rem;
+            flex-grow: 1;
+        }
+        
+        button:hover {
+            background: #8cff1a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 252, 85, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            background: #444;
+            border-color: #555;
+            color: #888;
+        }
+        
+        button.secondary {
+            background: #111111;
+            color: #73DD07;
+            border: 1px solid #73DD07;
+        }
+
+        button.secondary:hover {
+            background: #222;
+            color: #8cff1a;
+            border-color: #8cff1a;
+        }
+
+        button.secondary:disabled {
+            background: #111;
+            border-color: #444;
+            color: #444;
+        }
+        
+        button.reset {
+            background: #111;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            flex-grow: 0;
+        }
+        button.reset:hover {
+            background: #222;
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .step {
+            background: #111111;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1f2937;
+            display: none; /* Initially hidden */
+        }
+        
+        .step-title {
+            color: #73DD07;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.5rem;
+        }
+        
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #222;
+            border-radius: 4px;
+            border-left: 4px solid #73DD07;
+            color: #cbd5e1;
+        }
+        
+        /* New styles for Kasiski visualizer */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .scroll-box {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #222;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid #333;
+        }
+        
+        /* Custom scrollbar for webkit */
+        .scroll-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scroll-box::-webkit-scrollbar-track {
+            background: #222;
+            border-radius: 4px;
+        }
+        .scroll-box::-webkit-scrollbar-thumb {
+            background: #73DD07;
+            border-radius: 4px;
+        }
+        .scroll-box::-webkit-scrollbar-thumb:hover {
+            background: #8cff1a;
+        }
+        
+        .data-item {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            break-inside: avoid;
+        }
+
+        .data-item-box {
+            padding: 0.75rem;
+            background: #0c0c0f;
+            border: 1px solid #333;
+            border-left: 4px solid #73DD07;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+
+        .pattern {
+            color: #eab308; /* Tailwind yellow-400 */
+            font-weight: bold;
+        }
+        .label {
+            color: #999; /* Gray */
+        }
+        .value {
+            color: #86efac; /* Tailwind green-300 */
+            font-weight: 600;
+        }
+        .factor {
+            color: #67e8f9; /* Tailwind cyan-300 */
+            font-weight: 600;
+        }
+
+        .factor-details {
+            margin-left: 1rem;
+            margin-top: 0.25rem;
+            font-size: 1rem;
+        }
+        
+        /* Step 4: Results List */
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #222;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .result-item.top {
+            background: #163a1f; /* Dark green */
+            border-color: #73DD07;
+            box-shadow: 0 0 15px rgba(16, 252, 85, 0.2);
+        }
+        
+        .result-rank {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #73DD07;
+            min-width: 40px;
+        }
+        
+        .result-item.top .result-rank {
+            color: #86efac;
+        }
+        
+        .result-body {
+            margin-left: 1.25rem;
+            flex-grow: 1;
+        }
+        
+        .result-label {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .result-length {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #eab308;
+            margin-left: 0.5rem;
+        }
+        
+        .result-count {
+            text-align: right;
+            min-width: 100px;
+        }
+        
+        .result-count-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .result-count-label {
+            font-size: 0.875rem;
+            color: #999;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">       
+        <header>
+            <h1>Kasiski Examination</h1>
+            <p class="subtitle">Step-by-step Vigenère Cipher Key Length Analysis</p>
+        </header>
+        
+        <div class="app-container">
+            <!-- Input Panel -->
+            <div class="panel">
+                <h2>1. Ciphertext Input</h2>
+                <textarea id="ciphertext-input">Ypk dbsl nvpqa g thzztmnq auuz fkxvlx bnl kfdgnxi xrhbsa, spkwwxpgl bnl mjuvlly qt tr xwas. Pj azhgi iz h iwmipinkk, nteqtn bsbu hg fjezl tn auvjzzhbsbe. Ixmqtk nx tol ftctatnvy vy qwyz, t lzgcxdixk hk anhmymxlw izkhfx itk uwwqlg uzutbxmy. Ixkwxl nx azyxyknll f xgaa xpxvnimj pg rqya, t kczbkj iy bguzkkbhbgiej iy aaj anpyyqtn lfvjz hk bnl wjakym.
+
+Ypkf lfg cl twm jvhrmj, aafb ubk xbxbzltk pl kczpej. Bnlr bpozijz um hzz ouxaqzhuqm jlyjiz, wtnvzpgl i mybr xojmzzk vy fvtpantgabtv. Hbm ypkf wt vua dswc dafb hbksa cpmmqt vnw pkhkya, zox zvepxqlouz kqxl hk lkmbfvil, mmm ouwtuoatgtk zinzoa hk aayondgs.
+
+Ytz cl twm tvm rmxled aayonduyl; bm gyx ypk pgmmxpmtzy vy f tknthg lvklmj pg gtuvw fvj zthzombhm. Cl vfzxf mmm clblpz vy hwaumqmyz zjvkytyquul, ypkpk mwvll fvj kkjisz kjazpgl cvvg tcx zatcrkxwa. Cl twm zox juhvwnukum tn zoxnz aupfdkybso ivnwiml, mmmoy kjtkumqmmyz izzybby wl mkjmjvf.
+
+Tcx qhzztlr miy ixjv lytzona pnbn wxwqr, lthp yaxu nuypfzj ttwskk ud bnl tlwtpsnvm shxa um mmwyl pj pksw imgy. Rjb, gtbiaz aaj lgydsmyz, t gmgjhs wl ohum yabqt lsbhskyl, lcokbso ubk bie aawwana ypk zmtzs. Aana nvij qy uhy juyg tn thbam uwmnuozf gcz mktu zox zvhyxfsgiej juuwx wl jtrixhwjzol, mmm aupfdkybso lhbyp ou xfkn vmmmx.
+
+Zh qmz aaj lubuymxz lhwlm, ejb zox hgtpvx atlxw. Bnlbw euywx ixl uzb nveqwc lvmwkz, itekyejay ah jfzpglcoza ypk mefuk aafb hbksa cpmmqt bl. Bm cpeq vua yftzlk; bm cpeq vua rnmrk. Pj eose uzkzl tvchki, way ajixal fjrhsj eoaa f nolkhm jlmjzspgfbovg yw ucxwkutx ftr vuxbgjeja.
+
+Lvk ftr dx mibl mt lu pl yw svoj nuypfzj. Uhy nuy zqwxf, gtb lvk wmivzsqzphs, jaa ytz zox xiql hk bnvlj env vfuk ixkwxl nx, nuy mmm lbmzzk dx xbxpoj bu jkjizl, ytz zox qmmhvd ek pgymtk mt tkhoj jkobsl. Cl pntr tham lvkbixk, mtokaajz, aumnt ubk kqthe gzkhmm.</textarea>
+
+                <div class="button-group">
+                    <button id="start-btn">Start Analysis</button>
+                    <button id="reset-btn" class="reset" style="display: none;">Reset</button>
+                </div>
+                
+                <div class="button-group" id="nav-buttons" style="display: none;">
+                    <button id="back-btn" class="secondary">« Previous Step</button>
+                    <button id="next-btn">Next Step »</button>
+                </div>
+            </div>
+            
+            <!-- Analysis Steps Container -->
+            <div class="process-steps" id="analysis-steps">
+                <!-- Steps will be dynamically injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Algorithm Helpers ---
+
+            const getFactors = (num) => {
+                const factors = new Set();
+                for (let i = 2; i <= Math.sqrt(num); i++) {
+                    if (num % i === 0) {
+                        factors.add(i);
+                        factors.add(num / i);
+                    }
+                }
+                if (num > 1) factors.add(num);
+                return Array.from(factors).sort((a, b) => a - b);
+            };
+
+            const findRepeatingPatterns = (text, minLength = 3, maxLength = 8) => {
+                const patterns = {};
+                const upperText = text.toUpperCase().replace(/[^A-Z]/g, '');
+
+                for (let len = minLength; len <= maxLength; len++) {
+                    for (let i = 0; i <= upperText.length - len; i++) {
+                        const pattern = upperText.substring(i, i + len);
+                        if (!patterns[pattern]) {
+                            patterns[pattern] = [];
+                        }
+                        patterns[pattern].push(i);
+                    }
+                }
+
+                return Object.entries(patterns)
+                    .filter(([_, positions]) => positions.length > 1)
+                    .map(([pattern, positions]) => ({ pattern, positions }))
+                    .sort((a, b) => b.positions.length - a.positions.length || b.pattern.length - a.pattern.length);
+            };
+
+            const calculateDistances = (patterns) => {
+                return patterns.map(({ pattern, positions }) => {
+                    const distances = [];
+                    for (let i = 1; i < positions.length; i++) {
+                        distances.push(positions[i] - positions[i - 1]);
+                    }
+                    return { pattern, distances };
+                });
+            };
+
+            const getAllFactors = (distances) => {
+                const allFactors = [];
+                distances.forEach(({ distances: distList }) => {
+                    distList.forEach(dist => {
+                        allFactors.push(...getFactors(dist));
+                    });
+                });
+                return allFactors;
+            };
+
+            const findCommonKeyLengths = (allFactors) => {
+                const counts = {};
+                allFactors.filter(f => f <= 20).forEach(factor => {
+                    counts[factor] = (counts[factor] || 0) + 1;
+                });
+
+                return Object.entries(counts)
+                    .map(([length, count]) => ({ length: Number(length), count }))
+                    .sort((a, b) => b.count - a.count);
+            };
+
+            // --- State and DOM Elements ---
+
+            let currentStep = 0;
+            let analysisResults = null;
+            const maxStep = 4;
+
+            const ciphertextInput = document.getElementById('ciphertext-input');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const navButtons = document.getElementById('nav-buttons');
+            const nextBtn = document.getElementById('next-btn');
+            const backBtn = document.getElementById('back-btn');
+            const analysisStepsContainer = document.getElementById('analysis-steps');
+            const defaultCiphertext = ciphertextInput.value;
+
+            // --- Event Handlers ---
+
+            startBtn.addEventListener('click', handleStart);
+            resetBtn.addEventListener('click', handleReset);
+            nextBtn.addEventListener('click', handleNext);
+            backBtn.addEventListener('click', handleBack);
+            ciphertextInput.addEventListener('input', () => {
+                if (currentStep > 0) {
+                    handleReset();
+                }
+            });
+
+            function handleStart() {
+                const text = ciphertextInput.value;
+                const cleanText = text.toUpperCase().replace(/[^A-Z]/g, '');
+                
+                if (cleanText.length < 10) {
+                    alert("Please enter more ciphertext to analyze.");
+                    return;
+                }
+
+                // Run full analysis
+                const patterns = findRepeatingPatterns(cleanText);
+                const distances = calculateDistances(patterns);
+                const factors = getAllFactors(distances);
+                const keyLengths = findCommonKeyLengths(factors);
+                const distanceFactors = distances.map(({ pattern, distances: distList }) => ({
+                    pattern,
+                    distances: distList.map(dist => ({
+                        distance: dist,
+                        factors: getFactors(dist)
+                    }))
+                }));
+
+                analysisResults = { patterns, distances, distanceFactors, keyLengths };
+                
+                // Render all step HTML
+                analysisStepsContainer.innerHTML = `
+                    ${renderStep1HTML()}
+                    ${renderStep2HTML()}
+                    ${renderStep3HTML()}
+                    ${renderStep4HTML()}
+                `;
+
+                currentStep = 1;
+                updateUI();
+            }
+
+            function handleReset() {
+                currentStep = 0;
+                analysisResults = null;
+                analysisStepsContainer.innerHTML = '';
+                ciphertextInput.value = defaultCiphertext;
+                updateUI();
+            }
+
+            function handleNext() {
+                if (currentStep < maxStep) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
+
+            function handleBack() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateUI();
+                }
+            }
+
+            // --- UI Update Functions ---
+
+            function updateUI() {
+                // Toggle button visibility
+                startBtn.style.display = (currentStep === 0) ? 'block' : 'none';
+                resetBtn.style.display = (currentStep > 0) ? 'block' : 'none';
+                navButtons.style.display = (currentStep > 0) ? 'flex' : 'none';
+
+                if (currentStep > 0) {
+                    // Update nav button states
+                    backBtn.disabled = (currentStep <= 1);
+                    nextBtn.disabled = (currentStep >= maxStep);
+
+                    // Show/hide steps
+                    const steps = analysisStepsContainer.querySelectorAll('.step');
+                    steps.forEach((step, index) => {
+                        step.style.display = (index + 1 <= currentStep) ? 'block' : 'none';
+                    });
+
+                    // Scroll to the new step
+                    if (currentStep > 0) {
+                        const currentStepEl = document.getElementById(`step-${currentStep}`);
+                        if (currentStepEl) {
+                            currentStepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                }
+            }
+
+            // --- HTML Render Functions ---
+
+            function renderStep1HTML() {
+                const topPatterns = analysisResults.patterns.slice(0, 20);
+                const items = topPatterns.map(({ pattern, positions }) => `
+                    <div class="data-item">
+                        <span class="pattern">"${pattern}"</span>
+                        <span class="label"> (${positions.length} times) at: </span>
+                        <span class="value">${positions.join(', ')}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="step" id="step-1">
+                        <h3 class="step-title">Step 1: Identify Repeating Patterns</h3>
+                        <p class="explanation">Found ${analysisResults.patterns.length} repeating patterns (3+ chars). Showing top ${topPatterns.length}:</p>
+                        <div class="grid-container scroll-box" style="margin-top: 1rem;">
+                            ${items}
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderStep2HTML() {
+                const topDistances = analysisResults.distances.slice(0, 20);
+                const items = topDistances.map(({ pattern, distances }) => `
+                    <div class="data-item">
+                        <span class="pattern">"${pattern}"</span>
+                        <span class="label"> → Distances: </span>
+                        <span class="value">${distances.join(', ')}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="step" id="step-2">
+                        <h3 class="step-title">Step 2: Calculate Distances</h3>
+                        <p class="explanation">Calculated distances between sequential occurrences of each pattern. Showing top ${topDistances.length}:</p>
+                        <div class="grid-container scroll-box" style="margin-top: 1rem;">
+                            ${items}
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderStep3HTML() {
+                const topDistanceFactors = analysisResults.distanceFactors.slice(0, 15);
+                const items = topDistanceFactors.map(({ pattern, distances }) => `
+                    <div class="data-item-box">
+                        <span class="pattern">"${pattern}"</span>
+                        ${distances.map(({ distance, factors }) => `
+                            <div class="factor-details">
+                                <span class="label">Dist: </span>
+                                <span class="value" style="min-width: 40px; display: inline-block;">${distance}</span>
+                                <span class="label"> → Factors: </span>
+                                <span class="factor">${factors.join(', ')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('');
+                
+                return `
+                    <div class="step" id="step-3">
+                        <h3 class="step-title">Step 3: Find Common Factors</h3>
+                        <p class="explanation">Finding all factors for each distance (factors {'>'} 1). These factors are potential key lengths. Showing for top patterns:</p>
+                        <div class="grid-container scroll-box" style="margin-top: 1rem;">
+                            ${items}
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderStep4HTML() {
+                const items = analysisResults.keyLengths.map(({ length, count }, index) => `
+                    <div class="result-item ${index === 0 ? 'top' : ''}">
+                        <div class="result-rank">${index + 1}.</div>
+                        <div class="result-body">
+                            <span class="result-label">Key Length:</span>
+                            <span class="result-length">${length}</span>
+                        </div>
+                        <div class="result-count">
+                            <span class="result-count-value">${count}</span>
+                            <span class="result-count-label">Occurrences</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="step" id="step-4">
+                        <h3 class="step-title">Step 4: Propose Key Length Candidates</h3>
+                        <p class="explanation">Tallying all factors. The most frequent factors are the most likely key lengths. (Hint: The real key for this text is 5).</p>
+                        <div style="margin-top: 1.5rem;">
+                            ${items}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
