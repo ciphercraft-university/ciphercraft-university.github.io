@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scytale Cipher Characteristics | CipherCraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --htb-green: #9fef00;
+            --htb-green-dim: rgba(159, 239, 0, 0.1);
+            --bg-dark: #0b121f;
+            --bg-card: #111927;
+            --text-main: #b6b7bb;
+            --text-header: #ffffff;
+            --border-color: #2b3b55;
+            --code-bg: #1a2332;
+            --accent-blue: #3967ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        a {
+            color: var(--htb-green);
+            text-decoration: none;
+            transition: 0.3s;
+            border-bottom: 1px dotted var(--htb-green);
+        }
+
+        a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--htb-green);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: var(--text-header);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "##";
+            color: var(--htb-green);
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h3 {
+            color: #fff;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* --- Cards & Content --- */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .panel:hover {
+            border-color: var(--htb-green);
+        }
+
+        /* --- Table Styles --- */
+        .characteristics-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .characteristics-table th {
+            background: rgba(255,255,255,0.05);
+            color: var(--htb-green);
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .characteristics-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            color: #fff;
+        }
+
+        .category-header {
+            background: rgba(159, 239, 0, 0.1) !important;
+            color: var(--htb-green) !important;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .characteristics-table tr:nth-child(even) {
+            background: rgba(17, 25, 39, 0.7);
+        }
+
+        .characteristics-table tr:nth-child(odd) {
+            background: var(--bg-card);
+        }
+
+        .characteristics-table tr:hover {
+            background: rgba(159, 239, 0, 0.05);
+        }
+
+        .strength-weak {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .strength {
+            background: var(--htb-green-dim);
+            color: var(--htb-green);
+            border: 1px solid var(--htb-green);
+        }
+
+        .weakness {
+            background: rgba(255, 95, 86, 0.1);
+            color: #ff5f56;
+            border: 1px solid #ff5f56;
+        }
+
+        /* --- Explanation Boxes --- */
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(90deg, rgba(159, 239, 0, 0.05) 0%, rgba(0,0,0,0) 100%);
+            border-left: 3px solid var(--htb-green);
+            border-radius: 4px;
+        }
+
+        .comparison-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .comparison-box {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .comparison-box h3 {
+            color: var(--htb-green);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .comparison-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .comparison-list li:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-list strong {
+            color: var(--htb-green);
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .comparison-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .characteristics-table {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* --- Code Span --- */
+        .code-span {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255,255,255,0.1);
+            color: var(--htb-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Scytale Cipher Characteristics</h1>
+            <p class="subtitle">Complete cryptographic profile of the ancient Spartan cipher</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="panel">
+                <h2>CRYPTOGRAPHIC CHARACTERISTICS</h2>
+                
+                <table class="characteristics-table">
+                    <tr class="category-header">
+                        <th colspan="2">Basic Classification</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Type</strong></td>
+                        <td class="value-cell">Transposition Cipher</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Category</strong></td>
+                        <td class="value-cell">Classical Cipher</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Origin</strong></td>
+                        <td class="value-cell">Ancient Greece (Sparta), ~5th century BCE</td>
+                    </tr>
+                    
+                    <tr class="category-header">
+                        <th colspan="2">Technical Properties</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Alphabet Used</strong></td>
+                        <td class="value-cell">Monoalphabetic (same alphabet for input/output)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Polyalphabetic?</strong></td>
+                        <td class="value-cell">No - uses only one alphabet</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Substitution Type</strong></td>
+                        <td class="value-cell">None - letters are rearranged, not substituted</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transposition Method</strong></td>
+                        <td class="value-cell">Columnar transposition with fixed key</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Space</strong></td>
+                        <td class="value-cell">Very small - limited by message length</td>
+                    </tr>
+                    
+                    <tr class="category-header">
+                        <th colspan="2">Security Analysis</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Security Level</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak weakness">Very Low</span> - Easily broken by modern standards
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Brute Force Resistance</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak weakness">Poor</span> - Only n-1 possible keys for message of length n
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Frequency Analysis Resistance</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak weakness">None</span> - Letter frequencies preserved
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pattern Concealment</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak weakness">Limited</span> - Only breaks up adjacent letters
+                        </td>
+                    </tr>
+                    
+                    <tr class="category-header">
+                        <th colspan="2">Operational Characteristics</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Type</strong></td>
+                        <td class="value-cell">Symmetric (same key for encryption/decryption)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Material</strong></td>
+                        <td class="value-cell">Physical rod diameter / number of columns</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Encryption Speed</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak strength">Fast</span> - Simple mechanical operation
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Error Propagation</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak strength">Minimal</span> - Errors affect only specific positions
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Implementation</strong></td>
+                        <td class="value-cell">Physical device (rod and parchment) or simple algorithm</td>
+                    </tr>
+                    
+                    <tr class="category-header">
+                        <th colspan="2">Historical Context</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Primary Use</strong></td>
+                        <td class="value-cell">Military communication in ancient Sparta</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security in Era</strong></td>
+                        <td class="value-cell">
+                            <span class="strength-weak strength">Adequate</span> - Against contemporary threats
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Historical Significance</strong></td>
+                        <td class="value-cell">One of earliest known cryptographic devices</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="panel">
+                <h2>COMPARISON WITH OTHER CIPHERS</h2>
+                
+                <div class="comparison-section">
+                    <div class="comparison-box">
+                        <h3>Similar to Scytale</h3>
+                        <ul class="comparison-list">
+                            <li><strong>Rail Fence Cipher</strong> - Also a transposition cipher</li>
+                            <li><strong>Columnar Transposition</strong> - Same mathematical principle</li>
+                            <li><strong>Route Cipher</strong> - Reads text in different patterns</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="comparison-box">
+                        <h3>Different from Scytale</h3>
+                        <ul class="comparison-list">
+                            <li><strong>Caesar Cipher</strong> - Substitution cipher, not transposition</li>
+                            <li><strong>Vigenère Cipher</strong> - Polyalphabetic substitution</li>
+                            <li><strong>One-Time Pad</strong> - Information-theoretically secure</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h3>Key Cryptographic Insights</h3>
+                    <p><strong>Why Scytale is a Transposition Cipher:</strong> The Scytale doesn't change the identity of letters (A remains A, B remains B), but it changes their positions. This is the defining characteristic of transposition ciphers.</p>
+                    
+                    <p><strong>Why Scytale is NOT Polyalphabetic:</strong> Polyalphabetic ciphers use multiple substitution alphabets (like the Vigenère cipher). The Scytale uses the same alphabet throughout - it just rearranges the order of letters.</p>
+                    
+                    <p><strong>Security Limitations:</strong> The small key space and preservation of letter frequencies make the Scytale vulnerable to brute-force attacks and frequency analysis. Its security in ancient times relied mainly on the enemy not knowing the method itself.</p>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>MODERN PERSPECTIVE</h2>
+                
+                <div class="explanation">
+                    <p><strong>Educational Value:</strong> Despite its weak security, the Scytale cipher remains important for teaching fundamental cryptographic concepts like transposition, key space, and the difference between substitution and transposition ciphers.</p>
+                    
+                    <p><strong>Historical Importance:</strong> The Scytale represents one of humanity's first attempts at systematic encryption and demonstrates how physical devices can implement cryptographic algorithms.</p>
+                    
+                    <p><strong>Modern Relevance:</strong> While the Scytale itself isn't used today, the principle of transposition appears in modern cryptography as part of more complex systems like block ciphers (e.g., in the permutation layers of algorithms like DES and AES).</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="logo-area">
+                <span style="font-family: 'JetBrains Mono'; font-weight: bold; color: #fff;">Ciphercraft</span>
+                <span style="color: var(--border-color);">|</span>
+                <span style="color: var(--htb-green);"><a href="https://hackthebox.com">Hack The Box</a></span>
+            </div>
+            <p>Providing reliable knowledge & science since 10 June 2017.</p>
+            <p>&copy; 2025 - All rights reserved</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scytale Cipher Visualizer | Ciphercraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --htb-green: #9fef00;
+            --htb-green-dim: rgba(159, 239, 0, 0.1);
+            --bg-dark: #0b121f;
+            --bg-card: #111927;
+            --text-main: #b6b7bb;
+            --text-header: #ffffff;
+            --border-color: #2b3b55;
+            --code-bg: #1a2332;
+            --accent-blue: #3967ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        a {
+            color: var(--htb-green);
+            text-decoration: none;
+            transition: 0.3s;
+            border-bottom: 1px dotted var(--htb-green);
+        }
+
+        a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--htb-green);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: var(--text-header);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "##";
+            color: var(--htb-green);
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h3 {
+            color: #fff;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* --- Cards & Content --- */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .panel:hover {
+            border-color: var(--htb-green);
+        }
+
+        /* --- Input/Output Styles --- */
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            background: var(--code-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--htb-green);
+            box-shadow: 0 0 0 2px rgba(159, 239, 0, 0.2);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--htb-green);
+            box-shadow: 0 0 0 2px rgba(159, 239, 0, 0.2);
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            background: var(--htb-green);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid var(--htb-green);
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        button:hover:not(:disabled) {
+            background: #b6ff00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(159, 239, 0, 0.3);
+        }
+
+        button:disabled {
+            background: #555;
+            border-color: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            color: #888;
+        }
+
+        .output {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            min-height: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+            word-wrap: break-word;
+            color: var(--htb-green);
+        }
+
+        /* --- Explanation Boxes --- */
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(90deg, rgba(159, 239, 0, 0.05) 0%, rgba(0,0,0,0) 100%);
+            border-left: 3px solid var(--htb-green);
+            border-radius: 4px;
+        }
+
+        ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1.5rem 0;
+        }
+
+        /* --- Scytale-specific styles --- */
+        .visualization-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .grid {
+            display: inline-grid;
+            gap: 4px;
+            background: var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .grid-cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .grid-cell.active {
+            background: var(--htb-green);
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(159, 239, 0, 0.8);
+        }
+
+        .grid-cell.empty {
+            background: var(--bg-dark);
+            color: #555;
+        }
+
+        .step-indicator {
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.5rem;
+            background: var(--htb-green-dim);
+            border-radius: 4px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .reading-direction {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: var(--code-bg);
+            border-radius: 4px;
+            text-align: center;
+            font-style: italic;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-text {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .grid-cell {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .legend {
+                gap: 1rem;
+            }
+        }
+
+        /* --- Code Span --- */
+        .code-span {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255,255,255,0.1);
+            color: var(--htb-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .grid-cell.active {
+        background: var(--htb-green);
+        color: #fff; /* Changed from #fafafa to #000 */
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(159, 239, 0, 0.8);
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container">       
+        <header>
+            <h1>Scytale Cipher</h1>
+            <p class="subtitle">Visualize the ancient Spartan transposition cipher step by step</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="panel">
+                <h2>INPUT</h2>
+                <div class="input-group">
+                    <label for="input-text">Plaintext (letters only):</label>
+                    <textarea id="input-text" placeholder="Enter plaintext to encrypt...">ATTACKATDAWN</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="key-input">Key (Number of Columns / Rod Diameter):</label>
+                    <input type="number" id="key-input" min="2" max="10" value="4">
+                </div>
+                <button id="encrypt-btn">▶ Encrypt Text</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+
+            <div class="panel">
+                <h2>VISUALIZATION</h2>
+                <div class="step-indicator" id="step-indicator">Click "Encrypt Text" to begin</div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--htb-green);"></div>
+                        <div class="legend-text">Current Processing</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--bg-card);"></div>
+                        <div class="legend-text">Processed</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--bg-dark);"></div>
+                        <div class="legend-text">Not Processed</div>
+                    </div>
+                </div>
+                
+                <div class="visualization-container">
+                    <div class="grid-container">
+                        <h3>Writing Grid (Row-by-Row)</h3>
+                        <div class="grid" id="writing-grid"></div>
+                        <div class="reading-direction" id="writing-direction">Write plaintext row by row into the grid</div>
+                    </div>
+                    
+                    <div class="grid-container">
+                        <h3>Reading Grid (Column-by-Column)</h3>
+                        <div class="grid" id="reading-grid"></div>
+                        <div class="reading-direction" id="reading-direction">Read ciphertext column by column from the grid</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="prev-step" disabled>Previous Step</button>
+                    <button id="next-step" disabled>Next Step</button>
+                    <button id="auto-play" disabled>Auto Play</button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>OUTPUT</h2>
+                <div class="output" id="output-text">
+                    <!-- Encrypted text will appear here -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>HOW IT WORKS</h2>
+                <div class="explanation">
+                    <p>The Scytale cipher was used by ancient Spartans for military communication. It's a transposition cipher that rearranges the order of letters without changing them.</p>
+                    <ol>
+                        <li><strong>Setup:</strong> A strip of parchment is wrapped around a rod with a specific diameter (the key).</li>
+                        <li><strong>Writing:</strong> The message is written along the length of the rod (row by row in our grid).</li>
+                        <li><strong>Reading:</strong> The parchment is unwrapped, and the message is read across the width (column by column in our grid).</li>
+                        <li><strong>Decryption:</strong> The receiver wraps the parchment around an identical rod and reads along the length.</li>
+                    </ol>
+                    <p>The security depends entirely on the enemy not knowing the rod's diameter (the key). In this visualization, the key represents the number of columns in our grid.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="logo-area">
+                <span style="font-family: 'JetBrains Mono'; font-weight: bold; color: #fff;">Ciphercraft</span>
+                <span style="color: var(--border-color);">|</span>
+                <span style="color: var(--htb-green);"><a href="https://hackthebox.com">Hack The Box</a></span>
+            </div>
+            <p>Providing reliable knowledge & science since 10 June 2017.</p>
+            <p>&copy; 2025 - All rights reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputTextEl = document.getElementById('input-text');
+            const keyInputEl = document.getElementById('key-input');
+            const outputTextEl = document.getElementById('output-text');
+            const encryptBtn = document.getElementById('encrypt-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const prevStepBtn = document.getElementById('prev-step');
+            const nextStepBtn = document.getElementById('next-step');
+            const autoPlayBtn = document.getElementById('auto-play');
+            const stepIndicatorEl = document.getElementById('step-indicator');
+            const writingGridEl = document.getElementById('writing-grid');
+            const readingGridEl = document.getElementById('reading-grid');
+            const writingDirectionEl = document.getElementById('writing-direction');
+            const readingDirectionEl = document.getElementById('reading-direction');
+            
+            let plaintext = '';
+            let key = 4;
+            let ciphertext = '';
+            let currentStep = 0;
+            let totalSteps = 0;
+            let autoPlayInterval = null;
+            let steps = [];
+            
+            function initializeVisualization() {
+                plaintext = inputTextEl.value.toUpperCase().replace(/[^A-Z]/g, '');
+                key = parseInt(keyInputEl.value);
+                
+                if (plaintext.length === 0) {
+                    alert('Please enter some text to encrypt.');
+                    return false;
+                }
+                
+                if (key < 2 || key > 10) {
+                    alert('Key must be between 2 and 10.');
+                    return false;
+                }
+                
+                // Calculate grid dimensions
+                const numRows = Math.ceil(plaintext.length / key);
+                
+                // Initialize steps array
+                steps = [];
+                
+                // Step 0: Initial state
+                steps.push({
+                    type: 'initial',
+                    message: 'Ready to begin encryption'
+                });
+                
+                // Step 1: Create empty grid
+                const grid = Array(numRows).fill().map(() => Array(key).fill(''));
+                steps.push({
+                    type: 'grid_created',
+                    grid: JSON.parse(JSON.stringify(grid)),
+                    message: `Created ${numRows} × ${key} grid`
+                });
+                
+                // Steps 2+: Fill grid row by row
+                let charIndex = 0;
+                for (let row = 0; row < numRows; row++) {
+                    for (let col = 0; col < key; col++) {
+                        if (charIndex < plaintext.length) {
+                            grid[row][col] = plaintext[charIndex];
+                            steps.push({
+                                type: 'write_char',
+                                grid: JSON.parse(JSON.stringify(grid)),
+                                row: row,
+                                col: col,
+                                char: plaintext[charIndex],
+                                message: `Writing '${plaintext[charIndex]}' at position (${row}, ${col})`
+                            });
+                            charIndex++;
+                        }
+                    }
+                }
+                
+                // Steps for reading column by column
+                ciphertext = '';
+                for (let col = 0; col < key; col++) {
+                    for (let row = 0; row < numRows; row++) {
+                        if (grid[row][col]) {
+                            ciphertext += grid[row][col];
+                            steps.push({
+                                type: 'read_char',
+                                grid: JSON.parse(JSON.stringify(grid)),
+                                row: row,
+                                col: col,
+                                char: grid[row][col],
+                                ciphertext: ciphertext,
+                                message: `Reading '${grid[row][col]}' from column ${col}, adding to ciphertext: ${ciphertext}`
+                            });
+                        }
+                    }
+                }
+                
+                // Final step
+                steps.push({
+                    type: 'complete',
+                    ciphertext: ciphertext,
+                    message: `Encryption complete! Ciphertext: ${ciphertext}`
+                });
+                
+                totalSteps = steps.length;
+                currentStep = 0;
+                
+                return true;
+            }
+            
+            function renderStep(stepIndex) {
+                if (stepIndex < 0 || stepIndex >= totalSteps) return;
+                
+                const step = steps[stepIndex];
+                stepIndicatorEl.textContent = `Step ${stepIndex + 1}/${totalSteps}: ${step.message}`;
+                
+                // Update output
+                if (step.ciphertext) {
+                    outputTextEl.textContent = step.ciphertext;
+                } else if (stepIndex === 0) {
+                    outputTextEl.textContent = '';
+                }
+                
+                // Render grids based on step type
+                if (step.grid) {
+                    renderWritingGrid(step);
+                    renderReadingGrid(step);
+                }
+                
+                // Update button states
+                prevStepBtn.disabled = stepIndex <= 0;
+                nextStepBtn.disabled = stepIndex >= totalSteps - 1;
+                
+                // Update auto-play button text
+                if (autoPlayInterval) {
+                    autoPlayBtn.textContent = 'Pause';
+                } else {
+                    autoPlayBtn.textContent = 'Auto Play';
+                }
+            }
+            
+            function renderWritingGrid(step) {
+                const grid = step.grid;
+                const numRows = grid.length;
+                const numCols = grid[0].length;
+                
+                writingGridEl.innerHTML = '';
+                writingGridEl.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
+                
+                for (let row = 0; row < numRows; row++) {
+                    for (let col = 0; col < numCols; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        
+                        if (grid[row][col]) {
+                            cell.textContent = grid[row][col];
+                            
+                            // Highlight active cell during writing
+                            if (step.type === 'write_char' && step.row === row && step.col === col) {
+                                cell.classList.add('active');
+                                writingDirectionEl.textContent = `Writing '${step.char}' at row ${row}, column ${col}`;
+                            }
+                        } else {
+                            cell.classList.add('empty');
+                            cell.textContent = '·';
+                        }
+                        
+                        writingGridEl.appendChild(cell);
+                    }
+                }
+            }
+            
+            function renderReadingGrid(step) {
+                const grid = step.grid;
+                const numRows = grid.length;
+                const numCols = grid[0].length;
+                
+                readingGridEl.innerHTML = '';
+                readingGridEl.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
+                
+                // Create a copy of the grid to mark reading progress
+                const readingGrid = Array(numRows).fill().map(() => Array(numCols).fill(''));
+                
+                // Fill with actual values
+                for (let row = 0; row < numRows; row++) {
+                    for (let col = 0; col < numCols; col++) {
+                        readingGrid[row][col] = grid[row][col];
+                    }
+                }
+                
+                // Mark cells that have been read
+                if (step.type === 'read_char') {
+                    // Mark all cells in previous columns as read
+                    for (let c = 0; c < step.col; c++) {
+                        for (let r = 0; r < numRows; r++) {
+                            if (readingGrid[r][c]) {
+                                readingGrid[r][c] = { char: readingGrid[r][c], read: true };
+                            }
+                        }
+                    }
+                    
+                    // Mark cells in current column up to current row as read
+                    for (let r = 0; r <= step.row; r++) {
+                        if (readingGrid[r][step.col]) {
+                            readingGrid[r][step.col] = { 
+                                char: readingGrid[r][step.col], 
+                                read: true,
+                                active: (r === step.row && step.col === step.col)
+                            };
+                        }
+                    }
+                }
+                
+                // Render the reading grid
+                for (let row = 0; row < numRows; row++) {
+                    for (let col = 0; col < numCols; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        
+                        const cellData = readingGrid[row][col];
+                        
+                        if (cellData && cellData.char) {
+                            cell.textContent = cellData.char;
+                            
+                            if (cellData.read) {
+                                // Already read - darker background
+                                cell.style.backgroundColor = 'var(--bg-card)';
+                            }
+                            
+                            // Highlight active cell during reading
+                            if (step.type === 'read_char' && step.row === row && step.col === col) {
+                                cell.classList.add('active');
+                                readingDirectionEl.textContent = `Reading '${step.char}' from column ${col}, row ${row}`;
+                            }
+                        } else if (grid[row][col]) {
+                            cell.textContent = grid[row][col];
+                        } else {
+                            cell.classList.add('empty');
+                            cell.textContent = '·';
+                        }
+                        
+                        readingGridEl.appendChild(cell);
+                    }
+                }
+            }
+            
+            function nextStep() {
+                if (currentStep < totalSteps - 1) {
+                    currentStep++;
+                    renderStep(currentStep);
+                }
+            }
+            
+            function prevStep() {
+                if (currentStep > 0) {
+                    currentStep--;
+                    renderStep(currentStep);
+                }
+            }
+            
+            function toggleAutoPlay() {
+                if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                    autoPlayInterval = null;
+                    autoPlayBtn.textContent = 'Auto Play';
+                } else {
+                    autoPlayInterval = setInterval(() => {
+                        if (currentStep < totalSteps - 1) {
+                            nextStep();
+                        } else {
+                            toggleAutoPlay(); // Stop at the end
+                        }
+                    }, 1500);
+                    autoPlayBtn.textContent = 'Pause';
+                }
+            }
+            
+            function reset() {
+                if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                    autoPlayInterval = null;
+                }
+                
+                plaintext = '';
+                ciphertext = '';
+                currentStep = 0;
+                totalSteps = 0;
+                steps = [];
+                
+                writingGridEl.innerHTML = '';
+                readingGridEl.innerHTML = '';
+                outputTextEl.textContent = '';
+                stepIndicatorEl.textContent = 'Click "Encrypt Text" to begin';
+                writingDirectionEl.textContent = 'Write plaintext row by row into the grid';
+                readingDirectionEl.textContent = 'Read ciphertext column by column from the grid';
+                
+                prevStepBtn.disabled = true;
+                nextStepBtn.disabled = true;
+                autoPlayBtn.disabled = true;
+            }
+            
+            function encrypt() {
+                if (initializeVisualization()) {
+                    currentStep = 0;
+                    renderStep(currentStep);
+                    
+                    prevStepBtn.disabled = false;
+                    nextStepBtn.disabled = false;
+                    autoPlayBtn.disabled = false;
+                }
+            }
+            
+            // Event listeners
+            encryptBtn.addEventListener('click', encrypt);
+            resetBtn.addEventListener('click', reset);
+            prevStepBtn.addEventListener('click', prevStep);
+            nextStepBtn.addEventListener('click', nextStep);
+            autoPlayBtn.addEventListener('click', toggleAutoPlay);
+            
+            // Initialize
+            reset();
+        });
+    </script>
+</body>
+</html>
