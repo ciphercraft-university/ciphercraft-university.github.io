@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demystifying Negative Remainders | CipherCraft - HTB Style</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --htb-green: #9fef00;
+            --htb-green-dim: rgba(159, 239, 0, 0.1);
+            --htb-green-dark: rgba(159, 239, 0, 0.2);
+            --bg-dark: #0b121f;
+            --bg-card: #111927;
+            --bg-input: #1a2332;
+            --text-main: #b6b7bb;
+            --text-header: #ffffff;
+            --border-color: #2b3b55;
+            --border-light: rgba(43, 59, 85, 0.3);
+            --terminal-bg: #0d1117;
+            --accent-blue: #3967ff;
+            --accent-red: #ff4757;
+            --accent-purple: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .htb-badge {
+            background: var(--htb-green);
+            color: #0b121f;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(159, 239, 0, 0.3);
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Main Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--htb-green);
+            box-shadow: 0 4px 25px rgba(159, 239, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-header h2 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .card-icon {
+            color: var(--htb-green);
+            font-size: 1.2rem;
+        }
+
+        /* Interactive Demo */
+        .demo-panel {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .input-label {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--htb-green);
+            min-width: 100px;
+        }
+
+        .number-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-header);
+            padding: 10px 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            width: 120px;
+            text-align: center;
+        }
+
+        .number-input:focus {
+            outline: none;
+            border-color: var(--htb-green);
+            box-shadow: 0 0 0 2px rgba(159, 239, 0, 0.1);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--htb-green);
+            color: #0b121f;
+            border: none;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #b6ff00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(159, 239, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--htb-green);
+            border: 1px solid var(--htb-green);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(159, 239, 0, 0.1);
+        }
+
+        /* Terminal Output */
+        .terminal-output {
+            background: var(--terminal-bg);
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .terminal-content {
+            padding: 20px;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: var(--bg-input);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Process Steps */
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 900px) {
+            .process-steps {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background: var(--htb-green);
+            color: #0b121f;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .step-title {
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        .step-content {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 3px solid var(--htb-green);
+            margin-top: 1rem;
+        }
+
+        /* Clock Visualization */
+        .clock-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .clock-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+        }
+
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--htb-green);
+            border-radius: 50%;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .clock-hand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 120px;
+            background: var(--htb-green);
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%) rotate(0deg);
+            transition: transform 0.5s ease;
+        }
+
+        .clock-number {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .clock-display {
+            background: var(--bg-input);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem auto;
+            max-width: 400px;
+            border: 1px solid var(--border-light);
+        }
+
+        .clock-value {
+            font-size: 2rem;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .clock-equation {
+            font-size: 1rem;
+            color: #8b949e;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Explanation Box */
+        .explanation-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--htb-green);
+            padding: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            margin: 1.5rem 0;
+        }
+
+        .explanation-box h3 {
+            color: var(--htb-green);
+            margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-block {
+            background: var(--terminal-bg);
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--htb-green);
+            overflow-x: auto;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo span {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            color: var(--text-header);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(159, 239, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(159, 239, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(159, 239, 0, 0); }
+        }
+
+        .success {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="htb-badge">Modular Arithmetic</div>
+            <h1>Demystifying Negative Remainders</h1>
+            <p class="subtitle">Understanding how modular arithmetic works with negative numbers through visual examples</p>
+        </header>
+
+        <div class="content-grid">
+            <!-- Introduction Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[?]</span>
+                    <h2>INTRODUCTION</h2>
+                </div>
+                <div class="explanation-box">
+                    <p>Have you ever wondered how negative numbers work in modular arithmetic? How can −3 divided by 26 give a remainder of 23?</p>
+                    <p>This interactive guide will demystify these concepts through visualizations and clear explanations.</p>
+                </div>
+            </div>
+
+            <!-- Interactive Demo Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[>]</span>
+                    <h2>INTERACTIVE MODULO CALCULATOR</h2>
+                </div>
+
+                <div class="demo-panel">
+                    <div class="input-row">
+                        <span class="input-label">DIVIDEND:</span>
+                        <input type="number" id="dividend" class="number-input" value="-3">
+                        <span class="input-label">DIVISOR:</span>
+                        <input type="number" id="divisor" class="number-input" value="26">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn" id="calculate-btn">
+                            <span>▶</span> CALCULATE MODULO
+                        </button>
+                        <button class="btn btn-secondary" id="reset-btn">
+                            <span>↺</span> RESET
+                        </button>
+                    </div>
+
+                    <div class="terminal-output">
+                        <div class="terminal-content" id="mod-result">
+                            −3 mod 26 = 23
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value" id="quotient-value">-1</div>
+                            <div class="stat-label">Quotient</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="remainder-value">23</div>
+                            <div class="stat-label">Remainder</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="equation-result">26×-1+23</div>
+                            <div class="stat-label">Equation</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="mod-value">23</div>
+                            <div class="stat-label">Mod Value</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Steps -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[#]</span>
+                    <h2>STEP-BY-STEP PROCESS</h2>
+                </div>
+
+                <div class="process-steps">
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <div class="step-title">UNDERSTAND THE EQUATION</div>
+                        </div>
+                        <div class="step-content">
+                            We need to express:
+                            <div class="code-block">
+                                dividend = divisor × quotient + remainder
+                            </div>
+                            For −3 ÷ 26:
+                            <div class="code-block">
+                                −3 = 26 × q + r, where 0 ≤ r < 26
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <div class="step-title">FIND THE QUOTIENT</div>
+                        </div>
+                        <div class="step-content">
+                            Calculate using floor division:
+                            <div class="code-block">
+                                q = floor(−3 / 26)
+                                q = floor(−0.115...)
+                                q = −1
+                            </div>
+                            Round down to nearest integer.
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">3</div>
+                            <div class="step-title">CALCULATE REMAINDER</div>
+                        </div>
+                        <div class="step-content">
+                            Apply the formula:
+                            <div class="code-block">
+                                r = −3 - (26 × −1)
+                                r = −3 + 26
+                                r = 23
+                            </div>
+                            Satisfies: 0 ≤ 23 < 26
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clock Visualization Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[⌚]</span>
+                    <h2>CLOCK ANALOGY VISUALIZATION</h2>
+                </div>
+
+                <div class="clock-section">
+                    <p>Modular arithmetic works like a clock that wraps around. Visualize with a 26-hour clock:</p>
+
+                    <div class="clock-display">
+                        <div class="clock-value" id="clock-counter">0</div>
+                        <div class="clock-equation" id="clock-equation">0 ≡ 0 (mod 26)</div>
+                    </div>
+
+                    <div class="clock-container">
+                        <div class="clock-face" id="mod-clock">
+                            <div class="clock-hand" id="clock-hand"></div>
+                        </div>
+                    </div>
+
+                    <div class="control-panel">
+                        <button class="btn btn-secondary" id="step-backward">
+                            <span>←</span> -1 STEP
+                        </button>
+                        <button class="btn btn-secondary" id="move-backward">
+                            <span>↶</span> -3 STEPS
+                        </button>
+                        <button class="btn btn-secondary" id="reset-clock">
+                            <span>↺</span> RESET
+                        </button>
+                        <button class="btn btn-secondary" id="move-forward">
+                            <span>↷</span> +3 STEPS
+                        </button>
+                        <button class="btn btn-secondary" id="step-forward">
+                            <span>→</span> +1 STEP
+                        </button>
+                    </div>
+
+                    <div class="explanation-box">
+                        <p>When we move backward 3 steps from 0 on a 26-hour clock, we land at position 23.</p>
+                        <p>This visually demonstrates why <strong>−3 mod 26 = 23</strong>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mathematical Definition Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[∑]</span>
+                    <h2>MATHEMATICAL DEFINITION</h2>
+                </div>
+                <div class="explanation-box">
+                    <p>For any integers a and n > 0, the modulo operation is defined as:</p>
+                    <div class="code-block">
+                        a mod n = a - n × floor(a / n)
+                    </div>
+                    <p>Applied to our example:</p>
+                    <div class="code-block">
+                        −3 mod 26 = −3 - 26 × floor(−3 / 26)
+                        = −3 - 26 × (−1)
+                        = −3 + 26
+                        = 23
+                    </div>
+                    <p>This definition ensures the remainder is always non-negative and less than the divisor.</p>
+                </div>
+            </div>
+
+            <!-- Programming Perspective Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[&lt;/&gt;]</span>
+                    <h2>PROGRAMMING PERSPECTIVE</h2>
+                </div>
+                <div class="explanation-box">
+                    <p>Different languages handle negative modulo differently:</p>
+                    <div class="code-block">
+                        # Python (uses floor division)
+                        -3 % 26  # Returns 23
+                        
+                        // JavaScript
+                        (-3 % 26) // Returns 23
+                        
+                        /* C/C++ - May give different results */
+                        -3 % 26  // Implementation dependent
+                    </div>
+                    <p>Most modern languages follow the mathematical definition for consistency.</p>
+                </div>
+            </div>
+
+            <!-- Applications Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[⚡]</span>
+                    <h2>PRACTICAL APPLICATIONS</h2>
+                </div>
+                <div class="explanation-box">
+                    <h3>Modular arithmetic with negative numbers is essential in:</h3>
+                    <div class="code-block" style="background: transparent; border: none; padding: 0;">
+                        • CRYPTOGRAPHY: Encryption algorithms
+                        • COMPUTER SCIENCE: Hash functions, circular buffers
+                        • GAME DEV: Screen wrapping, circular movement
+                        • MUSIC THEORY: Chord progressions, scales
+                        • CRYPTOGRAPHY: Caesar cipher decryption
+                    </div>
+                    <p style="margin-top: 1rem;">Understanding negative remainders is crucial for proper implementation of these systems.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-logo">
+                <span style="color: var(--htb-green);">Ciphercraft</span>
+                <span style="color: var(--border-color);">|</span>
+                <span>Inspired by <a href="https://hackthebox.com" style="color: var(--htb-green);">Hack The Box</a></span>
+            </div>
+            <p>Providing reliable cryptography education since 2025</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #6c757d;">
+                © 2025 - All rights reserved | 
+                <a href="https://ciphercraft-university.github.io/" style="color: var(--htb-green);">CipherCraft University</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize clock visualization
+            initClock(26);
+            
+            // Set up event listeners
+            document.getElementById('calculate-btn').addEventListener('click', calculateModulo);
+            document.getElementById('reset-btn').addEventListener('click', resetCalculator);
+            document.getElementById('step-forward').addEventListener('click', () => moveClock(1));
+            document.getElementById('step-backward').addEventListener('click', () => moveClock(-1));
+            document.getElementById('move-forward').addEventListener('click', () => moveClock(3));
+            document.getElementById('move-backward').addEventListener('click', () => moveClock(-3));
+            document.getElementById('reset-clock').addEventListener('click', resetClock);
+            
+            // Initial calculation
+            calculateModulo();
+            
+            function calculateModulo() {
+                const dividend = parseInt(document.getElementById('dividend').value);
+                const divisor = parseInt(document.getElementById('divisor').value);
+                
+                if (divisor === 0) {
+                    alert('Divisor cannot be zero!');
+                    return;
+                }
+                
+                // Calculate quotient and remainder
+                const quotient = Math.floor(dividend / divisor);
+                const remainder = dividend - divisor * quotient;
+                
+                // For negative divisors, we need to adjust
+                let modValue = ((dividend % divisor) + divisor) % divisor;
+                
+                // Update display
+                document.getElementById('quotient-value').textContent = quotient;
+                document.getElementById('remainder-value').textContent = remainder;
+                document.getElementById('equation-result').textContent = `${divisor}×${quotient}+${remainder}`;
+                document.getElementById('mod-value').textContent = modValue;
+                
+                document.getElementById('mod-result').textContent = 
+                    `${dividend} mod ${divisor} = ${modValue}`;
+            }
+            
+            function resetCalculator() {
+                document.getElementById('dividend').value = -3;
+                document.getElementById('divisor').value = 26;
+                calculateModulo();
+                resetClock();
+            }
+            
+            function initClock(modulus) {
+                const clock = document.getElementById('mod-clock');
+                clock.innerHTML = '<div class="clock-hand" id="clock-hand"></div>';
+                
+                // Add numbers around the clock
+                for (let i = 0; i < modulus; i++) {
+                    const angle = (i * (360 / modulus) - 90) * (Math.PI / 180);
+                    const radius = 120;
+                    const x = 150 + radius * Math.cos(angle);
+                    const y = 150 + radius * Math.sin(angle);
+                    
+                    const number = document.createElement('div');
+                    number.className = 'clock-number';
+                    number.textContent = i;
+                    number.style.left = `${x - 15}px`;
+                    number.style.top = `${y - 15}px`;
+                    
+                    clock.appendChild(number);
+                }
+                
+                // Initialize hand position
+                updateClockHand(0);
+            }
+            
+            function updateClockHand(position) {
+                const modulus = parseInt(document.getElementById('divisor').value);
+                const hand = document.getElementById('clock-hand');
+                const angle = (position * (360 / modulus)) % 360;
+                hand.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+                
+                // Calculate the congruent value (always between 0 and modulus-1)
+                let congruentValue = position % modulus;
+                if (congruentValue < 0) congruentValue += modulus;
+                
+                // Update counter display
+                document.getElementById('clock-counter').textContent = position;
+                document.getElementById('clock-equation').textContent = 
+                    `${position} ≡ ${congruentValue} (mod ${modulus})`;
+            }
+            
+            function moveClock(steps) {
+                const modulus = parseInt(document.getElementById('divisor').value);
+                const currentText = document.getElementById('clock-counter').textContent;
+                const currentPos = parseInt(currentText);
+                
+                let newPos = currentPos + steps;
+                updateClockHand(newPos);
+            }
+            
+            function resetClock() {
+                updateClockHand(0);
+            }
+        });
+    </script>
+</body>
+</html>

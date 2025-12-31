@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Visualizer | CipherCraft - HTB Style</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --htb-green: #9fef00;
+            --htb-green-dim: rgba(159, 239, 0, 0.1);
+            --htb-green-dark: rgba(159, 239, 0, 0.2);
+            --bg-dark: #0b121f;
+            --bg-card: #111927;
+            --bg-input: #1a2332;
+            --text-main: #b6b7bb;
+            --text-header: #ffffff;
+            --border-color: #2b3b55;
+            --border-light: rgba(43, 59, 85, 0.3);
+            --terminal-bg: #0d1117;
+            --accent-blue: #3967ff;
+            --accent-red: #ff4757;
+            --accent-purple: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .htb-badge {
+            background: var(--htb-green);
+            color: #0b121f;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(159, 239, 0, 0.3);
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Main App Layout */
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--htb-green);
+            box-shadow: 0 4px 25px rgba(159, 239, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-header h2 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .card-icon {
+            color: var(--htb-green);
+            font-size: 1.2rem;
+        }
+
+        /* Input & Controls */
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--htb-green);
+            box-shadow: 0 0 0 2px rgba(159, 239, 0, 0.1);
+        }
+
+        /* Slider */
+        .slider-container {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-input);
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .slider-value {
+            color: var(--htb-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 4px 12px;
+            background: rgba(159, 239, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--htb-green);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid var(--bg-dark);
+            box-shadow: 0 0 10px rgba(159, 239, 0, 0.5);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: var(--bg-input);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Process Steps */
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
+
+        .step-title {
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            background: var(--htb-green);
+            color: var(--bg-dark);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Character Visualization */
+        .char-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .char-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            min-width: 60px;
+            transition: all 0.3s;
+        }
+
+        .char-box:hover {
+            border-color: var(--htb-green);
+            transform: translateY(-2px);
+        }
+
+        .char-main {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 5px;
+        }
+
+        .char-meta {
+            font-size: 0.7rem;
+            color: #8b949e;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Output */
+        .output-terminal {
+            background: var(--terminal-bg);
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #161b22;
+            padding: 8px 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .terminal-content {
+            padding: 20px;
+            color: #e6edf3;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+        }
+
+        /* Success Banner */
+        .success-banner {
+            background: linear-gradient(90deg, rgba(159, 239, 0, 0.1) 0%, rgba(159, 239, 0, 0.05) 100%);
+            border: 1px solid var(--htb-green);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(159, 239, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(159, 239, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(159, 239, 0, 0); }
+        }
+
+        .success-title {
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Explanation */
+        .explanation-box {
+            background: var(--bg-input);
+            border-left: 3px solid var(--htb-green);
+            padding: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            margin: 1.5rem 0;
+        }
+
+        .explanation-box h3 {
+            color: var(--htb-green);
+            margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .explanation-box ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .explanation-box li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .explanation-box li:before {
+            content: ">";
+            color: var(--htb-green);
+            position: absolute;
+            left: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo span {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            color: var(--text-header);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .process-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="htb-badge">Cryptography Module</div>
+            <h1>Caesar Cipher Visualizer</h1>
+            <p class="subtitle">Interactive visualization of the Caesar cipher substitution mechanism with real-time encryption</p>
+        </header>
+
+        <div class="app-grid">
+            <!-- Input Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[>]</span>
+                    <h2>INPUT & CONTROLS</h2>
+                </div>
+                
+                <textarea id="input-text" placeholder="Enter text to encrypt (e.g., ATTACK AT DAWN)">Hello World</textarea>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>SHIFT VALUE (KEY)</span>
+                        <span class="slider-value" id="shift-value">3</span>
+                    </div>
+                    <input type="range" id="shift-slider" min="0" max="25" value="3">
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="input-length">11</div>
+                        <div class="stat-label">Input Length</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="output-length">11</div>
+                        <div class="stat-label">Output Length</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Visualization -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[#]</span>
+                    <h2>VISUALIZATION PROCESS</h2>
+                </div>
+
+                <div class="process-steps">
+                    <div class="step-card">
+                        <div class="step-title">
+                            <span class="step-number">1</span>
+                            ORIGINAL CHARACTERS
+                        </div>
+                        <div id="original-text" class="char-grid"></div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-title">
+                            <span class="step-number">2</span>
+                            SHIFTED CHARACTERS
+                        </div>
+                        <div id="shifted-text" class="char-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[&gt;]</span>
+                    <h2>OUTPUT</h2>
+                </div>
+
+                <div class="output-terminal">
+                    <div class="terminal-header">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                        <span style="margin-left: 10px; color: #8b949e; font-size: 0.8rem;">ciphercraft@htb:~</span>
+                    </div>
+                    <div class="terminal-content" id="output-text">KHOOR ZRUOG</div>
+                </div>
+
+                <div id="successMessage">
+                    <div class="success-banner">
+                        <div class="success-title">✓ ENCRYPTION SUCCESSFUL</div>
+                        <p>Shift: <span id="encrypted-shift" style="color: var(--htb-green); font-weight: bold;">3</span> | 
+                           Ciphertext: <span id="encrypted-result" style="color: var(--htb-green); font-family: 'JetBrains Mono';">KHOOR ZRUOG</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explanation Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">[?]</span>
+                    <h2>HOW CAESAR CIPHER WORKS</h2>
+                </div>
+
+                <div class="explanation-box">
+                    <h3>ENCRYPTION ALGORITHM</h3>
+                    <ul>
+                        <li><strong>Substitution Cipher:</strong> Each letter is replaced by another letter</li>
+                        <li><strong>Fixed Shift:</strong> All letters shift by the same amount (key)</li>
+                        <li><strong>Modular Arithmetic:</strong> Wrap-around using modulo 26</li>
+                        <li><strong>Formula:</strong> Eₖ(m) = (m + k) mod 26</li>
+                        <li><strong>Decryption:</strong> Dₖ(c) = (c - k) mod 26</li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 1.5rem;">EXAMPLE WITH SHIFT 3</h3>
+                    <p style="font-family: 'JetBrains Mono'; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;">
+                        A → D, B → E, C → F, ..., X → A, Y → B, Z → C
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-logo">
+                <span style="color: var(--htb-green);">Ciphercraft</span>
+                <span style="color: var(--border-color);">|</span>
+                <span>Inspired by <a href="https://hackthebox.com" style="color: var(--htb-green);">Hack The Box</a></span>
+            </div>
+            <p>Providing reliable cryptography education since 2025</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #6c757d;">© 2025 - All rights reserved | <a href="https://ciphercraft-university.github.io/" style="color: var(--htb-green);">CipherCraft University</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputTextarea = document.getElementById('input-text');
+            const outputDiv = document.getElementById('output-text');
+            const shiftSlider = document.getElementById('shift-slider');
+            const shiftValueSpan = document.getElementById('shift-value');
+            const originalTextDiv = document.getElementById('original-text');
+            const shiftedTextDiv = document.getElementById('shifted-text');
+            const encryptedResultSpan = document.getElementById('encrypted-result');
+            const encryptedShiftSpan = document.getElementById('encrypted-shift');
+            const inputLengthSpan = document.getElementById('input-length');
+            const outputLengthSpan = document.getElementById('output-length');
+
+            function caesarEncrypt(text, shift) {
+                return text.toUpperCase().replace(/[A-Z]/g, (char) => {
+                    const charCode = char.charCodeAt(0);
+                    const shiftedCharCode = ((charCode - 65 + shift) % 26) + 65;
+                    return String.fromCharCode(shiftedCharCode);
+                });
+            }
+
+            function visualizeCipher() {
+                const inputText = inputTextarea.value;
+                const shift = parseInt(shiftSlider.value, 10);
+                const encryptedText = caesarEncrypt(inputText, shift);
+                
+                // Update UI elements
+                shiftValueSpan.textContent = shift;
+                outputDiv.textContent = encryptedText;
+                encryptedResultSpan.textContent = encryptedText;
+                encryptedShiftSpan.textContent = shift;
+                inputLengthSpan.textContent = inputText.length;
+                outputLengthSpan.textContent = encryptedText.length;
+                
+                // Clear visualization areas
+                originalTextDiv.innerHTML = '';
+                shiftedTextDiv.innerHTML = '';
+                
+                // Create character visualization
+                const upperText = inputText.toUpperCase();
+                
+                for (let i = 0; i < upperText.length; i++) {
+                    const char = upperText[i];
+                    const asciiCode = char.charCodeAt(0);
+                    
+                    // Original character box
+                    const originalBox = document.createElement('div');
+                    originalBox.className = 'char-box';
+                    originalBox.innerHTML = `
+                        <div class="char-main">${char}</div>
+                        <div class="char-meta">${asciiCode}</div>
+                    `;
+                    originalTextDiv.appendChild(originalBox);
+                    
+                    // Shifted character box
+                    const shiftedBox = document.createElement('div');
+                    shiftedBox.className = 'char-box';
+                    
+                    if (char >= 'A' && char <= 'Z') {
+                        const shiftedChar = String.fromCharCode(((asciiCode - 65 + shift) % 26) + 65);
+                        const shiftedAscii = shiftedChar.charCodeAt(0);
+                        shiftedBox.innerHTML = `
+                            <div class="char-main">${shiftedChar}</div>
+                            <div class="char-meta">${shiftedAscii}</div>
+                        `;
+                    } else {
+                        shiftedBox.innerHTML = `
+                            <div class="char-main">${char}</div>
+                            <div class="char-meta">${asciiCode}</div>
+                        `;
+                    }
+                    
+                    shiftedTextDiv.appendChild(shiftedBox);
+                }
+            }
+
+            // Event listeners
+            inputTextarea.addEventListener('input', visualizeCipher);
+            shiftSlider.addEventListener('input', function() {
+                visualizeCipher();
+            });
+
+            // Initialize
+            visualizeCipher();
+        });
+    </script>
+</body>
+</html>

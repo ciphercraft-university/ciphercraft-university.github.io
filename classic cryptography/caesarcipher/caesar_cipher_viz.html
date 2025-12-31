@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher | Real-Time Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --htb-green: #9fef00;
+            --htb-green-dim: rgba(159, 239, 0, 0.15);
+            --bg-dark: #0b121f;
+            --bg-panel: #111927;
+            --bg-code: #0d121b;
+            --text-main: #b6b7bb;
+            --text-header: #ffffff;
+            --border-color: #2b3b55;
+            --accent-blue: #3967ff;
+            --var-changed: #9fef00;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            color: var(--text-header);
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--htb-green); }
+
+        .status-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .code-panel {
+            flex: 1.2;
+            background: var(--bg-code);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .code-scroller {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .line-num {
+            width: 50px;
+            text-align: right;
+            padding-right: 15px;
+            color: #4a5568;
+            user-select: none;
+            border-right: 1px solid #1e2636;
+        }
+
+        .code-line {
+            padding-left: 20px;
+            color: #e6edf3;
+            white-space: pre;
+            position: relative;
+        }
+
+        .token-kw { color: #ff7b72; font-weight: bold; }
+        .token-func { color: #d2a8ff; }
+        .token-str { color: #a5d6ff; }
+        .token-num { color: #79c0ff; }
+        .token-comment { color: #8b949e; font-style: italic; }
+
+        .executing {
+            background: rgba(159, 239, 0, 0.1);
+        }
+
+        .executing .line-num {
+            color: var(--htb-green);
+            border-right: 1px solid var(--htb-green);
+            position: relative;
+            font-weight: bold;
+        }
+
+        .executing .line-num::before {
+            content: "➜";
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .memory-panel {
+            flex: 1;
+            background: var(--bg-panel);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--htb-green);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .frame {
+            background: #0d121b;
+            border: 1px solid #2b3b55;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .frame-header {
+            background: #1a2332;
+            padding: 8px 12px;
+            border-bottom: 1px solid #2b3b55;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .frame-body {
+            padding: 10px;
+        }
+
+        .variable {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .var-name { color: #8b949e; }
+        .var-value { color: #e6edf3; transition: color 0.3s; }
+        
+        .val-changed {
+            color: var(--htb-green) !important;
+            text-shadow: 0 0 5px var(--htb-green);
+            font-weight: bold;
+        }
+
+        .alphabet-wheel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .letter-box {
+            width: 32px;
+            height: 32px;
+            background: #1a2332;
+            border: 1px solid #2b3b55;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono';
+            font-size: 14px;
+            color: #6c757d;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .letter-box.source {
+            border-color: #3967ff;
+            background: rgba(57, 103, 255, 0.2);
+            color: #fff;
+            transform: scale(1.15);
+        }
+
+        .letter-box.target {
+            border-color: var(--htb-green);
+            background: rgba(159, 239, 0, 0.2);
+            color: #fff;
+            transform: scale(1.15);
+        }
+
+        .shift-indicator {
+            text-align: center;
+            margin: 10px 0;
+            font-family: 'JetBrains Mono';
+            color: var(--htb-green);
+            font-size: 0.9rem;
+        }
+
+        .char-transform {
+            background: #0d121b;
+            border: 1px solid #2b3b55;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'JetBrains Mono';
+        }
+
+        .transform-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .char-display {
+            font-size: 24px;
+            padding: 8px 16px;
+            background: #1a2332;
+            border: 1px solid #2b3b55;
+            border-radius: 4px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .char-display.active {
+            border-color: var(--htb-green);
+            color: var(--htb-green);
+        }
+
+        .arrow {
+            color: #6c757d;
+            font-size: 20px;
+        }
+
+        footer {
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--htb-green);
+            color: var(--htb-green);
+            padding: 8px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--htb-green);
+            color: #000;
+        }
+
+        button:disabled {
+            border-color: #4a5568;
+            color: #4a5568;
+            cursor: not-allowed;
+            background: transparent;
+        }
+        
+        .slider-container {
+            position: absolute;
+            bottom: 60px;
+            left: 20px; 
+            right: 20px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        input[type=range] {
+            width: 100%;
+            pointer-events: auto;
+            accent-color: var(--htb-green);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <span>>_</span> CAESAR_VISUALIZER
+        </div>
+        <div class="status-display" id="status-box">STATUS: IDLE</div>
+    </header>
+
+    <div class="workspace">
+        <div class="code-panel">
+            <div class="code-scroller">
+                <table class="code-table" id="code-table"></table>
+            </div>
+            
+            <div class="slider-container">
+                <input type="range" id="scrubber" min="0" max="0" value="0">
+            </div>
+        </div>
+
+        <div class="memory-panel">
+            
+            <div class="panel-section">
+                <div class="section-title">
+                    <span>RAM / STACK FRAMES</span>
+                    <span style="font-size:0.7em; color:#6c757d">LIFO STRUCTURE</span>
+                </div>
+                <div id="frames-container"></div>
+            </div>
+
+            <div class="panel-section" style="flex: 1;">
+                <div class="section-title">
+                    <span>CIPHER VISUALIZATION</span>
+                    <span style="font-size:0.7em; color:#6c757d">SHIFT OPERATION</span>
+                </div>
+                <div id="visualizer-container" style="text-align: center; color: #4a5568; font-style: italic; margin-top: 20px;">
+                    [Waiting for encryption operation...]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <button id="btn-start">|&lt; Start</button>
+        <button id="btn-prev">&lt; Prev</button>
+        <button id="btn-next">Next &gt;</button>
+        <button id="btn-end">End &gt;|</button>
+    </footer>
+
+    <script>
+        const rawCode = `def caesar_encrypt(plaintext, key):
+    # Convert to uppercase and process
+    cipher_text = ''
+    plaintext = plaintext.upper()
+    
+    for char in plaintext:
+        if char == ' ':
+            cipher_text += ' '
+        elif char.isalpha():
+            # Convert letter to number (A=0, B=1, ...)
+            index = ord(char) - ord('A')
+            # Apply shift with wrap-around
+            index = (index + key) % 26
+            # Convert back to letter
+            cipher_text += chr(index + ord('A'))
+        else:
+            cipher_text += char
+    
+    return cipher_text
+
+def caesar_decrypt(ciphertext, key):
+    # Decryption is just encryption with negative key
+    plain_text = ''
+    ciphertext = ciphertext.upper()
+    
+    for char in ciphertext:
+        if char == ' ':
+            plain_text += ' '
+        elif char.isalpha():
+            index = ord(char) - ord('A')
+            # Apply reverse shift with wrap-around
+            index = (index - key) % 26
+            plain_text += chr(index + ord('A'))
+        else:
+            plain_text += char
+    
+    return plain_text
+
+# --- Interactive Demo ---
+message = "HELLO WORLD"
+key = 3
+encrypted = caesar_encrypt(message, key)
+print(f"Encrypted: {encrypted}")
+decrypted = caesar_decrypt(encrypted, key)
+print(f"Decrypted: {decrypted}")`;
+
+        function highlightCode(code) {
+            const lines = code.split('\n');
+            const table = document.getElementById('code-table');
+            
+            lines.forEach((line, i) => {
+                const tr = document.createElement('tr');
+                tr.id = `line-${i + 1}`;
+                
+                let html = line
+                    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                    .replace(/("[^"]*")/g, '<span class="token-str">$1</span>')
+                    .replace(/('[^']*')/g, '<span class="token-str">$1</span>')
+                    .replace(/(#.*)/g, '<span class="token-comment">$1</span>')
+                    .replace(/\b(def|return|for|in|if|elif|else)\b/g, '<span class="token-kw">$1</span>')
+                    .replace(/\b(print|ord|chr|upper|isalpha)\b/g, '<span class="token-func">$1</span>')
+                    .replace(/\b(\d+)\b/g, '<span class="token-num">$1</span>');
+                
+                tr.innerHTML = `
+                    <td class="line-num">${i + 1}</td>
+                    <td class="code-line">${html}</td>
+                `;
+                table.appendChild(tr);
+            });
+        }
+        highlightCode(rawCode);
+
+        let trace = [];
+        let globalScope = {};
+        
+        function createStep(line, stack, stdout = null, viz = null) {
+            const stackCopy = JSON.parse(JSON.stringify(stack));
+            const globalCopy = JSON.parse(JSON.stringify(globalScope));
+            
+            return {
+                line: line,
+                globals: globalCopy,
+                stack: stackCopy,
+                stdout: stdout,
+                viz: viz
+            };
+        }
+
+        function runSimulation() {
+            trace = [];
+            globalScope = {};
+
+            trace.push(createStep(1, []));
+            trace.push(createStep(20, []));
+
+            globalScope['message'] = "HELLO WORLD";
+            trace.push(createStep(39, []));
+            
+            globalScope['key'] = 3;
+            trace.push(createStep(40, []));
+
+            // ENCRYPT
+            trace.push(createStep(41, []));
+            
+            let stack = [{ name: "caesar_encrypt", vars: { plaintext: "HELLO WORLD", key: 3 } }];
+            let vars = stack[0].vars;
+            
+            trace.push(createStep(1, stack));
+            
+            vars['cipher_text'] = '';
+            trace.push(createStep(3, stack));
+            
+            vars['plaintext'] = "HELLO WORLD";
+            trace.push(createStep(4, stack));
+
+            const msg = "HELLO WORLD";
+            let result = '';
+            
+            for(let i = 0; i < msg.length; i++) {
+                const char = msg[i];
+                vars['char'] = char;
+                trace.push(createStep(6, stack));
+                
+                if(char === ' ') {
+                    trace.push(createStep(7, stack));
+                    result += ' ';
+                    vars['cipher_text'] = result;
+                    trace.push(createStep(8, stack));
+                } else if(/[A-Z]/.test(char)) {
+                    trace.push(createStep(9, stack));
+                    
+                    const idx = char.charCodeAt(0) - 65;
+                    vars['index'] = idx;
+                    trace.push(createStep(11, stack, null, { type: 'shift', char: char, index: idx, key: 3, stage: 'original' }));
+                    
+                    const newIdx = (idx + 3) % 26;
+                    vars['index'] = newIdx;
+                    trace.push(createStep(13, stack, null, { type: 'shift', char: char, index: idx, newIndex: newIdx, key: 3, stage: 'shifted' }));
+                    
+                    const newChar = String.fromCharCode(newIdx + 65);
+                    trace.push(createStep(15, stack, null, { type: 'shift', char: char, newChar: newChar, index: idx, newIndex: newIdx, key: 3, stage: 'converted' }));
+                    
+                    result += newChar;
+                    vars['cipher_text'] = result;
+                    trace.push(createStep(15, stack));
+                }
+            }
+            
+            trace.push(createStep(19, stack));
+            
+            stack = [];
+            globalScope['encrypted'] = result;
+            trace.push(createStep(41, stack));
+            trace.push(createStep(42, stack, `Encrypted: ${result}`));
+
+            // DECRYPT
+            trace.push(createStep(43, stack));
+            
+            stack = [{ name: "caesar_decrypt", vars: { ciphertext: result, key: 3 } }];
+            vars = stack[0].vars;
+            
+            trace.push(createStep(20, stack));
+            
+            vars['plain_text'] = '';
+            trace.push(createStep(22, stack));
+            
+            vars['ciphertext'] = result;
+            trace.push(createStep(23, stack));
+
+            let decrypted = '';
+            
+            for(let i = 0; i < result.length; i++) {
+                const char = result[i];
+                vars['char'] = char;
+                trace.push(createStep(25, stack));
+                
+                if(char === ' ') {
+                    trace.push(createStep(26, stack));
+                    decrypted += ' ';
+                    vars['plain_text'] = decrypted;
+                    trace.push(createStep(27, stack));
+                } else if(/[A-Z]/.test(char)) {
+                    trace.push(createStep(28, stack));
+                    
+                    const idx = char.charCodeAt(0) - 65;
+                    vars['index'] = idx;
+                    trace.push(createStep(29, stack, null, { type: 'shift', char: char, index: idx, key: 3, stage: 'original', decrypt: true }));
+                    
+                    const newIdx = (idx - 3 + 26) % 26;
+                    vars['index'] = newIdx;
+                    trace.push(createStep(31, stack, null, { type: 'shift', char: char, index: idx, newIndex: newIdx, key: 3, stage: 'shifted', decrypt: true }));
+                    
+                    const newChar = String.fromCharCode(newIdx + 65);
+                    trace.push(createStep(32, stack, null, { type: 'shift', char: char, newChar: newChar, index: idx, newIndex: newIdx, key: 3, stage: 'converted', decrypt: true }));
+                    
+                    decrypted += newChar;
+                    vars['plain_text'] = decrypted;
+                    trace.push(createStep(32, stack));
+                }
+            }
+            
+            trace.push(createStep(36, stack));
+            
+            stack = [];
+            trace.push(createStep(43, stack));
+            trace.push(createStep(44, stack, `Decrypted: ${decrypted}`));
+        }
+
+        runSimulation();
+
+        let currentStep = 0;
+        const framesDiv = document.getElementById('frames-container');
+        const vizDiv = document.getElementById('visualizer-container');
+        const statusBox = document.getElementById('status-box');
+        const scrubber = document.getElementById('scrubber');
+        
+        scrubber.max = trace.length - 1;
+        scrubber.addEventListener('input', (e) => {
+            currentStep = parseInt(e.target.value);
+            render();
+        });
+
+        function render() {
+            const state = trace[currentStep];
+            const prevState = currentStep > 0 ? trace[currentStep-1] : null;
+
+            document.querySelectorAll('.executing').forEach(el => el.classList.remove('executing'));
+            const lineRow = document.getElementById(`line-${state.line}`);
+            if(lineRow) {
+                lineRow.classList.add('executing');
+                const container = document.querySelector('.code-scroller');
+                const offset = lineRow.offsetTop - container.offsetTop - (container.clientHeight / 2);
+                container.scrollTo({ top: offset, behavior: 'smooth' });
+            }
+
+            if(state.stdout) {
+                statusBox.textContent = `OUTPUT: ${state.stdout}`;
+                statusBox.style.borderColor = 'var(--htb-green)';
+            } else {
+                statusBox.textContent = `STEP ${currentStep + 1} / ${trace.length}`;
+                statusBox.style.borderColor = 'var(--border-color)';
+            }
+            scrubber.value = currentStep;
+
+            framesDiv.innerHTML = '';
+            renderFrame("Global Frame", state.globals, prevState ? prevState.globals : {});
+            state.stack.forEach((frame, idx) => {
+                const prevFrame = (prevState && prevState.stack[idx]) ? prevState.stack[idx] : null;
+                renderFrame(frame.name, frame.vars, prevFrame ? prevFrame.vars : {});
+            });
+
+            renderVisualization(state.viz);
+
+            document.getElementById('btn-start').disabled = currentStep === 0;
+            document.getElementById('btn-prev').disabled = currentStep === 0;
+            document.getElementById('btn-next').disabled = currentStep === trace.length - 1;
+            document.getElementById('btn-end').disabled = currentStep === trace.length - 1;
+        }
+
+        function renderFrame(title, vars, prevVars) {
+            if(Object.keys(vars).length === 0) return;
+
+            const box = document.createElement('div');
+            box.className = 'frame';
+            
+            let varsHtml = '';
+            for(const [key, val] of Object.entries(vars)) {
+                let displayVal = JSON.stringify(val);
+                if (typeof val === 'string') displayVal = `"${val}"`;
+
+                const prevVal = prevVars[key];
+                const isChanged = (JSON.stringify(val) !== JSON.stringify(prevVal));
+                const valClass = isChanged ? 'var-value val-changed' : 'var-value';
+
+                varsHtml += `
+                    <div class="variable">
+                        <span class="var-name">${key}</span>
+                        <span class="${valClass}">${displayVal}</span>
+                    </div>
+                `;
+            }
+
+            box.innerHTML = `
+                <div class="frame-header">${title}</div>
+                <div class="frame-body">${varsHtml}</div>
+            `;
+            framesDiv.appendChild(box);
+        }
+
+        function renderVisualization(viz) {
+            if(!viz) {
+                vizDiv.innerHTML = '<span style="color:#4a5568; font-style:italic;">No active cipher operation</span>';
+                return;
+            }
+
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            vizDiv.innerHTML = `
+                <div class="shift-indicator">
+                    ${viz.decrypt ? 'DECRYPTING' : 'ENCRYPTING'} WITH SHIFT = ${viz.key}
+                </div>
+            `;
+
+            const wheelDiv = document.createElement('div');
+            wheelDiv.className = 'alphabet-wheel';
+            
+            for(let i = 0; i < 26; i++) {
+                const box = document.createElement('div');
+                box.className = 'letter-box';
+                box.textContent = alphabet[i];
+                
+                if(viz.stage === 'original' && i === viz.index) {
+                    box.classList.add('source');
+                } else if(viz.stage === 'shifted' || viz.stage === 'converted') {
+                    if(i === viz.index) box.classList.add('source');
+                    if(i === viz.newIndex) box.classList.add('target');
+                }
+                
+                wheelDiv.appendChild(box);
+            }
+            vizDiv.appendChild(wheelDiv);
+
+            if(viz.stage === 'converted') {
+                const transform = document.createElement('div');
+                transform.className = 'char-transform';
+                transform.innerHTML = `
+                    <div class="transform-row">
+                        <div class="char-display">${viz.char}</div>
+                        <div class="arrow">→</div>
+                        <div class="char-display active">${viz.newChar}</div>
+                    </div>
+                    <div style="text-align:center; margin-top:10px; color:#6c757d; font-size:0.85rem;">
+                        Position ${viz.index} ${viz.decrypt ? '-' : '+'} ${viz.key} = ${viz.newIndex} (mod 26)
+                    </div>
+                `;
+                vizDiv.appendChild(transform);
+            }
+        }
+
+        document.getElementById('btn-next').onclick = () => {
+            if(currentStep < trace.length - 1) {
+                currentStep++;
+                render();
+            }
+        };
+
+        document.getElementById('btn-prev').onclick = () => {
+            if(currentStep > 0) {
+                currentStep--;
+                render();
+            }
+        };
+
+        document.getElementById('btn-start').onclick = () => {
+            currentStep = 0;
+            render();
+        };
+
+        document.getElementById('btn-end').onclick = () => {
+            currentStep = trace.length - 1;
+            render();
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowRight") document.getElementById('btn-next').click();
+            if(e.key === "ArrowLeft") document.getElementById('btn-prev').click();
+        });
+
+        render();
+    </script>
+</body>
+</html>
