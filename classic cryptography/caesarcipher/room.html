@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Caesar Cipher | Module</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --thm-red: #27c93f;
+            --thm-red-dim: #0076123b;
+            --thm-blue: #05e9f1;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #cbd5e1;
+            --text-header: #f8fafc;
+            --border-color: #334155;
+            --code-bg: #0f172a;
+            --accent-yellow: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        a {
+            color: var(--thm-red);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--thm-red);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .module-info {
+            display: flex;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: var(--thm-red-dim);
+            color: var(--thm-red);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--thm-red);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .meta-data {
+            color: #64748b;
+            padding: 4px 0;
+        }
+
+        h1 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        h2 {
+            color: var(--text-header);
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "##";
+            color: var(--thm-red);
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h3 {
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* --- Cards & Content --- */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .content-card:hover {
+            border-color: var(--thm-red);
+        }
+
+        /* --- Terminal/Code Blocks --- */
+        .terminal {
+            background: var(--code-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #1e293b;
+            padding: 8px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-red { background: var(--thm-red); }
+        .dot-yellow { background: var(--accent-yellow); }
+        .dot-blue { background: var(--thm-blue); }
+        .terminal-title { margin-left: 10px; color: #94a3b8; font-size: 0.8rem; }
+
+        .code-content {
+            padding: 15px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .highlight-var { color: #7dd3fc; }
+        .highlight-str { color: #f0abfc; }
+        .highlight-key { color: var(--thm-red); }
+        .highlight-comment { color: #94a3b8; font-style: italic; }
+
+        /* --- Tables & Grids --- */
+        .cyber-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .cyber-table th {
+            background: rgba(255,255,255,0.05);
+            color: var(--thm-red);
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cyber-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            color: #fff;
+        }
+
+        /* --- Lists & Utilities --- */
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        
+        strong { color: #fff; font-weight: 700; }
+        
+        .code-span {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255,255,255,0.1);
+            color: var(--thm-red);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .callout {
+            border-left: 3px solid var(--thm-red);
+            background: linear-gradient(90deg, rgba(132, 211, 47, 0.05) 0%, rgba(0,0,0,0) 100%);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .callout h4 {
+            color: var(--thm-red);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* --- Images --- */
+        figure {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        figure img {
+            max-width: 100%;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* --- Footer --- */
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* --- TryHackMe Room Styling --- */
+        .thm-room {
+            background: linear-gradient(135deg, #1a1f35 0%, #0d1424 100%);
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thm-room::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--thm-red) 0%, var(--thm-blue) 100%);
+        }
+
+        .thm-badge {
+            background: var(--thm-red);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .flag-input {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .flag-input input {
+            flex: 1;
+            padding: 12px 15px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        .flag-input input:focus {
+            outline: none;
+            border-color: var(--thm-red);
+            box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+        }
+
+        .submit-btn {
+            background: var(--thm-red);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #27c93f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .question-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+
+        .question-card:hover {
+            border-color: var(--thm-red);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .hint-box {
+            background: rgba(21, 101, 192, 0.1);
+            border-left: 3px solid var(--thm-blue);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--thm-red) 0%, var(--thm-blue) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* --- Animations --- */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="module-info">
+                <span class="badge">CLASSIC CRYPTO</span>
+                <span class="badge">DIFFICULTY: EASY</span>
+                <span class="badge">TOPIC: SUBSTITUTION</span>
+                <span class="meta-data">Created: Oct 26, 2025</span>
+            </div>
+            <h1>The Caesar Cipher</h1>
+            <p style="margin-top: 10px; color: #94a3b8;">A deep dive into history's most famous substitution cipher and its mathematical foundations.</p>
+        </header>
+
+        <section>
+            <figure>
+                <img src="image.png" alt="Caesar Cipher Illustration" style="max-height: 300px; object-fit: cover;">
+                <figcaption style="margin-top: 10px; color: #64748b; font-size: 0.8rem; font-family: 'JetBrains Mono';">Fig 1.0: Julius Caesar - Namesake of the cipher</figcaption>
+            </figure>
+
+            <div class="content-card">
+                <h2>1. Introduction</h2>
+                <p>The <strong>Caesar cipher</strong> is one of the simplest and most well-known encryption techniques. Named after Julius Caesar, who used it in his private correspondence, it's a type of <span class="code-span">substitution cipher</span> where each letter in the plaintext is shifted a certain number of places down the alphabet.</p>
+                
+                <div class="callout">
+                    <h4>Core Principle</h4>
+                    <p>Unlike transposition ciphers that rearrange letters, the Caesar cipher <strong>substitutes</strong> each letter with another letter a fixed number of positions away. This makes it a monoalphabetic substitution cipher.</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>1.1 Historical Context</h3>
+                <p>Julius Caesar used a shift of 3 (A→D, B→E, ..., Z→C) for his military communications. While incredibly simple by modern standards, it provided adequate security against illiterate enemies and casual observers.</p>
+                
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Cipher Type</td><td><strong>Monoalphabetic substitution</strong></td></tr>
+                        <tr><td>Key Space</td><td>25 possible shifts (excluding 0)</td></tr>
+                        <tr><td>Security Level</td><td>Trivial to break with frequency analysis</td></tr>
+                        <tr><td>Modern Variant</td><td>ROT13 (shift of 13)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>2. Mathematical Foundation</h2>
+            <p>The elegance of Caesar cipher lies in its mathematical formulation using <strong>modular arithmetic</strong>.</p>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-blue"></span>
+                    <span class="terminal-title">mathematical_notation.conf</span>
+                </div>
+                <div class="code-content">
+Let: A = 0, B = 1, C = 2, ..., Z = 25
+
+ENCRYPTION: Eₖ(m) = (m + k) mod 26
+DECRYPTION: Dₖ(c) = (c - k) mod 26
+
+Where:
+m = plaintext letter's numeric value
+c = ciphertext letter's numeric value  
+k = key (shift amount)
+mod 26 = wrap-around operation</div>
+            </div>
+
+            <h3>2.1 Modular Arithmetic in Action</h3>
+            <p>Consider encrypting 'Y' with shift 3:</p>
+            <ul>
+                <li>Y = 24 (numerical value)</li>
+                <li>24 + 3 = 27</li>
+                <li>27 mod 26 = 1</li>
+                <li>1 = B</li>
+                <li>Thus, Y → B (wrap-around achieved)</li>
+            </ul>
+
+            <div class="callout">
+                <h4>Negative Modulo Insight</h4>
+                <p>Decryption often involves negative numbers. In modular arithmetic: -2 mod 26 = 24. This is because we're dealing with a circular number system, not traditional division.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>3. Python Implementation</h2>
+            <p>A complete implementation with encryption and decryption functions.</p>
+
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-blue"></span>
+                    <span class="terminal-title">caesar.py</span>
+                </div>
+                <div class="code-content"><pre><code class="language-python"><span class="highlight-key">def</span> <span class="highlight-var">caesar_encrypt</span>(plaintext, key):
+    <span class="highlight-comment"># Convert to uppercase and process</span>
+    cipher_text = <span class="highlight-str">''</span>
+    plaintext = plaintext.upper()
+    
+    <span class="highlight-key">for</span> char <span class="highlight-key">in</span> plaintext:
+        <span class="highlight-key">if</span> char == <span class="highlight-str">' '</span>:
+            cipher_text += <span class="highlight-str">' '</span>
+        <span class="highlight-key">elif</span> char.isalpha():
+            <span class="highlight-comment"># Convert letter to number (A=0, B=1, ...)</span>
+            index = ord(char) - ord(<span class="highlight-str">'A'</span>)
+            <span class="highlight-comment"># Apply shift with wrap-around</span>
+            index = (index + key) % <span class="highlight-key">26</span>
+            <span class="highlight-comment"># Convert back to letter</span>
+            cipher_text += chr(index + ord(<span class="highlight-str">'A'</span>))
+        <span class="highlight-key">else</span>:
+            cipher_text += char
+    
+    <span class="highlight-key">return</span> cipher_text
+
+<span class="highlight-key">def</span> <span class="highlight-var">caesar_decrypt</span>(ciphertext, key):
+    <span class="highlight-comment"># Decryption is just encryption with negative key</span>
+    plain_text = <span class="highlight-str">''</span>
+    ciphertext = ciphertext.upper()
+    
+    <span class="highlight-key">for</span> char <span class="highlight-key">in</span> ciphertext:
+        <span class="highlight-key">if</span> char == <span class="highlight-str">' '</span>:
+            plain_text += <span class="highlight-str">' '</span>
+        <span class="highlight-key">elif</span> char.isalpha():
+            index = ord(char) - ord(<span class="highlight-str">'A'</span>)
+            <span class="highlight-comment"># Apply reverse shift with wrap-around</span>
+            index = (index - key) % <span class="highlight-key">26</span>
+            plain_text += chr(index + ord(<span class="highlight-str">'A'</span>))
+        <span class="highlight-key">else</span>:
+            plain_text += char
+    
+    <span class="highlight-key">return</span> plain_text
+
+<span class="highlight-comment"># --- Interactive Demo ---</span>
+<span class="highlight-key">if</span> __name__ == <span class="highlight-str">"__main__"</span>:
+    print(<span class="highlight-str">"[*] Caesar Cipher Interactive Demo"</span>)
+    message = input(<span class="highlight-str">"Enter message: "</span>)
+    key = int(input(<span class="highlight-str">"Enter shift key (0-25): "</span>))
+    
+    encrypted = caesar_encrypt(message, key)
+    print(f<span class="highlight-str">"Encrypted: {encrypted}"</span>)
+    
+    decrypted = caesar_decrypt(encrypted, key)
+    print(f<span class="highlight-str">"Decrypted: {decrypted}"</span>)</code></pre></div>
+            </div>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-title">Output</span>
+                </div>
+                <div class="code-content" style="color: var(--thm-red);">
+user@ciphercraft:~$ python3 caesar.py
+[*] Caesar Cipher Interactive Demo
+Enter message: ATTACK AT DAWN
+Enter shift key (0-25): 3
+Encrypted: DWWDFN DW GDZQ
+Decrypted: ATTACK AT DAWN
+user@ciphercraft:~$ _
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. Cryptanalysis & Weaknesses</h2>
+            <div class="content-card" style="border-left: 4px solid var(--thm-red);">
+                <h3 style="margin-top:0; color: var(--thm-red);">Security Assessment: TRIVIAL TO BREAK</h3>
+                <p>The Caesar cipher provides <strong>no semantic security</strong> and can be broken with minimal effort.</p>
+            </div>
+
+            <h3>4.1 Attack Methods</h3>
+            <ul>
+                <li><strong>Brute Force Attack:</strong> Only 25 possible keys (excluding shift of 0). A computer can test all possibilities in microseconds.</li>
+                <li><strong>Frequency Analysis:</strong> The most common letter in English is 'E'. Find the most common ciphertext letter and assume it decrypts to 'E'.</li>
+                <li><strong>Known Plaintext Attack:</strong> If you know any word in the message, you can immediately deduce the key.</li>
+            </ul>
+
+            <h3>4.2 Automated Cracker</h3>
+            <div class="terminal">
+                <div class="terminal-header">
+                     <span class="terminal-title">cracker.py</span>
+                </div>
+                <div class="code-content"><pre><code class="language-python"><span class="highlight-key">def</span> <span class="highlight-var">caesar_crack</span>(ciphertext):
+    print(<span class="highlight-str">"[*] Brute forcing all 25 possible shifts..."</span>)
+    <span class="highlight-key">for</span> key <span class="highlight-key">in</span> range(<span class="highlight-key">1</span>, <span class="highlight-key">26</span>):
+        attempt = caesar_decrypt(ciphertext, key)
+        <span class="highlight-comment"># Check for common English words</span>
+        <span class="highlight-key">if</span> <span class="highlight-str">'THE'</span> <span class="highlight-key">in</span> attempt <span class="highlight-key">or</span> <span class="highlight-str">'AND'</span> <span class="highlight-key">in</span> attempt:
+            print(f<span class="highlight-str">"[!] LIKELY MATCH (key={key}): {attempt}"</span>)
+        <span class="highlight-key">else</span>:
+            print(f<span class="highlight-str">"[-] Key {key:02}: {attempt}"</span>)
+
+<span class="highlight-comment"># Example usage</span>
+ciphertext = <span class="highlight-str">"PHHW PH DIWHU WKH WRJH"</span>
+caesar_crack(ciphertext)</code></pre></div>
+            </div>
+        </section>
+
+        <!-- TRYHACKME CHALLENGE ROOM -->
+        <section>
+            <div class="thm-room">
+                <div class="thm-badge">TRYHACKME ROOM: CAESAR CIPHER MASTERY</div>
+                
+                <h2 style="color: white; margin-bottom: 10px;">Challenge Room</h2>
+                <p style="margin-bottom: 20px; color: #cbd5e1;">Test your understanding of the Caesar cipher with these comprehensive challenges. Each question builds upon concepts covered in this module.</p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 30px; color: #94a3b8; font-family: 'JetBrains Mono';">
+                    <span id="progress-text">0/5 Questions Completed</span>
+                </div>
+
+                <!-- Question 1 -->
+                <div class="question-card">
+                    <h3 style="color: var(--thm-red); margin-top: 0;">Task 1: Historical Knowledge</h3>
+                    <p>What shift value did Julius Caesar reportedly use for his private correspondence?</p>
+                    <div class="flag-input">
+                        <input type="text" id="q1-input" placeholder="Enter shift value (number only)...">
+                        <button class="submit-btn" onclick="checkAnswer(1)">Submit Answer</button>
+                    </div>
+                    <div class="hint-box" id="q1-hint" style="display: none;">
+                        <strong>Hint:</strong> Check the historical context section. The answer is a single-digit number.
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-card">
+                    <h3 style="color: var(--thm-red); margin-top: 0;">Task 2: Mathematical Understanding</h3>
+                    <p>Using the formula Eₖ(m) = (m + k) mod 26, encrypt the letter 'X' with a key of 5. What letter do you get?</p>
+                    <div class="flag-input">
+                        <input type="text" id="q2-input" placeholder="Enter the resulting letter (uppercase)...">
+                        <button class="submit-btn" onclick="checkAnswer(2)">Submit Answer</button>
+                    </div>
+                    <div class="hint-box" id="q2-hint" style="display: none;">
+                        <strong>Hint:</strong> X = 23 (A=0, B=1, ... Z=25). Calculate (23 + 5) mod 26.
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question-card">
+                    <h3 style="color: var(--thm-red); margin-top: 0;">Task 3: Decryption Challenge</h3>
+                    <p>Decrypt the ciphertext "OLSSV" using a Caesar cipher with key 7. What is the plaintext?</p>
+                    <div class="flag-input">
+                        <input type="text" id="q3-input" placeholder="Enter plaintext (uppercase, no spaces)...">
+                        <button class="submit-btn" onclick="checkAnswer(3)">Submit Answer</button>
+                    </div>
+                    <div class="hint-box" id="q3-hint" style="display: none;">
+                        <strong>Hint:</strong> Use the decryption formula Dₖ(c) = (c - k) mod 26. Remember to handle wrap-around.
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question-card">
+                    <h3 style="color: var(--thm-red); margin-top: 0;">Task 4: Modular Arithmetic</h3>
+                    <p>What is the result of -17 mod 26? (This is important for decryption with certain keys)</p>
+                    <div class="flag-input">
+                        <input type="text" id="q4-input" placeholder="Enter the positive result (0-25)...">
+                        <button class="submit-btn" onclick="checkAnswer(4)">Submit Answer</button>
+                    </div>
+                    <div class="hint-box" id="q4-hint" style="display: none;">
+                        <strong>Hint:</strong> Think of a clock with 26 hours. If you go backward 17 hours from 0, where do you land?
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="question-card">
+                    <h3 style="color: var(--thm-red); margin-top: 0;">Task 5: Cryptanalysis</h3>
+                    <p>You intercept the ciphertext "KHOOR". Without knowing the key, how would you break this cipher? What technique requires minimal computational power?</p>
+                    <div class="flag-input">
+                        <input type="text" id="q5-input" placeholder="Enter the attack method name...">
+                        <button class="submit-btn" onclick="checkAnswer(5)">Submit Answer</button>
+                    </div>
+                    <div class="hint-box" id="q5-hint" style="display: none;">
+                        <strong>Hint:</strong> There are only 25 possible keys. This suggests a particular type of attack.
+                    </div>
+                </div>
+
+                <!-- Final Flag -->
+                <div class="question-card" id="final-flag" style="display: none; background: rgba(21, 101, 192, 0.1); border-color: var(--thm-blue);">
+                    <h3 style="color: var(--thm-blue); margin-top: 0;">🎉 ROOM COMPLETE!</h3>
+                    <p>Congratulations! You've mastered the Caesar cipher. Your final flag is:</p>
+                    <div style="background: #0f172a; padding: 15px; border-radius: 4px; margin: 15px 0; border: 1px solid var(--thm-blue);">
+                        <code style="color: var(--thm-red); font-family: 'JetBrains Mono'; font-size: 1.1rem;">THM{CA3SAR_UND3RST00D_MOD26_RUL3S}</code>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.9rem;">Share your achievement: #TryHackMe #CaesarCipherMastery</p>
+                </div>
+
+                <!-- Answer Feedback -->
+                <div id="feedback-area" style="margin-top: 30px; min-height: 60px; padding: 15px; border-radius: 4px; display: none;"></div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="logo-area">
+                <span style="font-family: 'JetBrains Mono'; font-weight: bold; color: #fff;">Ciphercraft</span>
+                <span style="color: var(--border-color);">|</span>
+                <span style="color: var(--htb-green);"><a href="https://hackthebox.com">Hack The Box</a></span>
+            </div>
+            <p>Providing reliable knowledge & science since 10 June 2017.</p>
+            <p>&copy; 2025 - All rights reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        // Correct answers
+        const correctAnswers = {
+            1: "3",
+            2: "C",
+            3: "HELLO",
+            4: "9",
+            5: "BRUTEFORCE"
+        };
+
+        // Alternative acceptable answers
+        const altAnswers = {
+            5: ["BRUTE FORCE", "BRUTE-FORCE", "EXHAUSTIVE SEARCH"]
+        };
+
+        let completedQuestions = 0;
+        const totalQuestions = 5;
+
+        function checkAnswer(questionNum) {
+            const input = document.getElementById(`q${questionNum}-input`);
+            const userAnswer = input.value.trim().toUpperCase();
+            const correctAnswer = correctAnswers[questionNum];
+            const feedbackArea = document.getElementById('feedback-area');
+            const hintBox = document.getElementById(`q${questionNum}-hint`);
+            
+            // Check if answer is correct
+            let isCorrect = false;
+            
+            if (questionNum === 5 && altAnswers[5]) {
+                // For question 5, check alternative answers
+                isCorrect = altAnswers[5].includes(userAnswer) || userAnswer === correctAnswer;
+            } else {
+                isCorrect = userAnswer === correctAnswer;
+            }
+            
+            if (isCorrect) {
+                // Correct answer
+                input.disabled = true;
+                input.style.background = 'rgba(21, 101, 192, 0.1)';
+                input.style.borderColor = 'var(--thm-blue)';
+                input.style.color = 'var(--thm-blue)';
+                
+                // Update button
+                const button = input.nextElementSibling;
+                button.textContent = '✓ CORRECT';
+                button.style.background = 'var(--thm-blue)';
+                button.disabled = true;
+                
+                // Show success feedback
+                feedbackArea.innerHTML = `
+                    <div style="color: var(--thm-blue); display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 1.5rem;">✓</div>
+                        <div>
+                            <strong>Task ${questionNum} Completed!</strong>
+                            <p style="margin-top: 5px; color: #94a3b8; font-size: 0.9rem;">Correct answer: ${userAnswer}</p>
+                        </div>
+                    </div>
+                `;
+                feedbackArea.style.display = 'block';
+                feedbackArea.style.background = 'rgba(21, 101, 192, 0.1)';
+                feedbackArea.style.border = '1px solid var(--thm-blue)';
+                
+                // Hide hint if shown
+                if (hintBox) hintBox.style.display = 'none';
+                
+                // Update progress
+                completedQuestions++;
+                updateProgress();
+                
+                // Show final flag if all questions completed
+                if (completedQuestions === totalQuestions) {
+                    setTimeout(() => {
+                        document.getElementById('final-flag').style.display = 'block';
+                        feedbackArea.innerHTML = `
+                            <div style="color: var(--thm-blue); text-align: center;">
+                                <strong>🎊 ROOM COMPLETE! 🎊</strong>
+                                <p style="margin-top: 10px; color: #94a3b8;">All tasks completed successfully. Scroll up to claim your flag!</p>
+                            </div>
+                        `;
+                    }, 1000);
+                }
+                
+                // Auto-hide feedback after 3 seconds (unless it's the last question)
+                if (completedQuestions < totalQuestions) {
+                    setTimeout(() => {
+                        feedbackArea.style.display = 'none';
+                    }, 3000);
+                }
+                
+            } else {
+                // Incorrect answer
+                feedbackArea.innerHTML = `
+                    <div style="color: var(--thm-red); display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 1.5rem;">✗</div>
+                        <div>
+                            <strong>Incorrect Answer</strong>
+                            <p style="margin-top: 5px; color: #94a3b8; font-size: 0.9rem;">Try again or click "Hint" for assistance.</p>
+                        </div>
+                    </div>
+                `;
+                feedbackArea.style.display = 'block';
+                feedbackArea.style.background = 'rgba(211, 47, 47, 0.1)';
+                feedbackArea.style.border = '1px solid var(--thm-red)';
+                
+                // Show hint button
+                if (hintBox) {
+                    hintBox.style.display = 'block';
+                }
+                
+                // Shake animation for wrong answer
+                input.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    input.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            
+            const percentage = (completedQuestions / totalQuestions) * 100;
+            progressFill.style.width = `${percentage}%`;
+            progressText.textContent = `${completedQuestions}/${totalQuestions} Questions Completed`;
+        }
+
+        // Allow Enter key to submit answers
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const questionNum = this.id.replace('q', '').replace('-input', '');
+                    checkAnswer(parseInt(questionNum));
+                }
+            });
+        });
+
+        // Show hint when clicking on question card
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.matches('input') && !e.target.matches('button')) {
+                    const hintId = this.querySelector('.hint-box')?.id;
+                    if (hintId) {
+                        const hintBox = document.getElementById(hintId);
+                        hintBox.style.display = hintBox.style.display === 'none' ? 'block' : 'none';
+                    }
+                }
+            });
+        });
+
+        // Initialize progress bar
+        updateProgress();
+    </script>
+
+</body>
+</html>
