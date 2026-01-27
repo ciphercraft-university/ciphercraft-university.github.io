@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherCraft | The Realm of Cryptology</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --neon-green: #9eff00; /* Matching the keys */
+            --neon-dim: #4b7a00;
+            --silver: #b0b0b0;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-head: 'Orbitron', sans-serif;
+            --font-body: 'Roboto Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+
+        /* --- Background Canvas --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-green);
+            border-radius: 4px;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(158, 255, 0, 0.1);
+        }
+
+        .nav-logo {
+            font-family: var(--font-head);
+            font-weight: 900;
+            color: var(--neon-green);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links button {
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 10px 25px;
+            font-family: var(--font-head);
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        .nav-links button:hover {
+            background: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        /* --- Hero Section --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-logo-container {
+            width: 250px;
+            height: 250px;
+            margin-bottom: 30px;
+            position: relative;
+            filter: drop-shadow(0 0 15px var(--neon-dim));
+        }
+
+        .hero-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        h1 {
+            font-family: var(--font-head);
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .glitch-text {
+            color: var(--neon-green);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--silver);
+            letter-spacing: 3px;
+            margin-bottom: 50px;
+            opacity: 0; /* Animated in */
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border-bottom: 2px solid var(--neon-green);
+            border-right: 2px solid var(--neon-green);
+            transform: rotate(45deg);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); opacity: 0.5;}
+            50% { transform: translateY(10px); opacity: 1;}
+        }
+
+        /* --- Courses Section --- */
+        #courses {
+            min-height: 100vh;
+            padding: 100px 5%;
+            position: relative;
+        }
+
+        .section-title {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 60px;
+            border-left: 5px solid var(--neon-green);
+            padding-left: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        /* --- Card Design (Glassmorphism + Gaming) --- */
+        .course-card {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(158, 255, 0, 0.1), transparent);
+            transition: 0.5s;
+            z-index: 1;
+        }
+
+        .course-card:hover::before {
+            left: 100%;
+        }
+
+        .course-card:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(158, 255, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            color: var(--neon-green);
+            margin-bottom: 20px;
+        }
+
+        .course-card h3 {
+            font-family: var(--font-head);
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .course-card p {
+            color: var(--silver);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(158, 255, 0, 0.1);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .course-card:hover .cta-btn {
+            background: var(--neon-green);
+            color: black;
+        }
+
+        /* Corner accents for gaming feel */
+        .corner {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--neon-green);
+            transition: 0.3s;
+            opacity: 0.5;
+        }
+        .tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+        .bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+        .br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+        .course-card:hover .corner {
+            width: 20px;
+            height: 20px;
+            opacity: 1;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--glass-border);
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        footer span {
+            color: var(--neon-green);
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav>
+        <div class="nav-logo">CipherCraft<span style="color:white">.</span></div>
+        <div class="nav-links">
+            <button>Terminal Access</button>
+        </div>
+    </nav>
+
+    <header>
+        <div class="hero-logo-container" id="logo-trigger">
+            <img src="Add a heading (1).png" alt="CipherCraft Logo Keys">
+        </div>
+        
+        <h1>Cipher<span class="glitch-text">Craft</span></h1>
+        <p class="tagline">THE REALM OF CRYPTOLOGY</p>
+        
+        <div class="scroll-indicator">
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <section id="courses">
+        <h2 class="section-title">Active Operations</h2>
+        
+        <div class="grid-container">
+            <a href="https://classroom.google.com/c/ODM3Njg0OTY0NTEx?cjc=t6ai2snl" target="_blank" class="course-card">
+                <div class="corner tl"></div><div class="corner tr"></div>
+                <div class="corner bl"></div><div class="corner br"></div>
+                
+                <div class="card-icon">01_</div>
+                <h3>Certified Cryptographer I</h3>
+                <p>Master the basics of ciphers, Understand How Code Breakers works starting from The Classic Cryptography.</p>
+                <div class="cta-btn">Access Classroom</div>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>Ph.D SAHRAOUI Mohammed .T.A // DESIGNED FOR <span>CIPHERCRAFT</span> // 2026 Inspired From HackTheBox</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/Draggable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/DrawSVGPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/EaselPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/Flip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/GSDevTools.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/InertiaPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/MotionPathHelper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/MotionPathPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/MorphSVGPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/Observer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/Physics2DPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/PhysicsPropsPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/PixiPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/ScrambleTextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/ScrollSmoother.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/ScrollToPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/SplitText.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/EasePack.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/CustomEase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/CustomBounce.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/CustomWiggle.min.js"></script>
+
+    <script>
+        // Register GSAP Plugins
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // --- 1. Background Animation (Canvas Nodes) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() * 1.5) - 0.75;
+                this.speedY = (Math.random() * 1.5) - 0.75;
+                this.color = '#9eff00'; // Neon Green
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 15000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + 
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = 'rgba(158, 255, 0,' + opacityValue * 0.2 + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+
+        // --- 2. GSAP Animations ---
+
+        // A. Hero Load Sequence
+        const tl = gsap.timeline();
+
+        // Logo float
+        gsap.to(".hero-logo-container", {
+            y: -15,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // Text Scramble Effect (Decryption vibe)
+        tl.from(".hero-logo-container", {
+            scale: 0,
+            opacity: 0,
+            duration: 1.5,
+            ease: "elastic.out(1, 0.3)"
+        })
+        .to("h1", {
+            duration: 2,
+            text: {
+                value: "CipherCraft",
+                delimiter: ""
+            },
+            ease: "none"
+        }, "-=1")
+        .to(".tagline", {
+            opacity: 1,
+            duration: 1,
+            text: "THE REALM OF CRYPTOLOGY",
+            ease: "power2.in"
+        });
+
+        // B. Scroll Trigger for Cards
+        gsap.from(".course-card", {
+            scrollTrigger: {
+                trigger: ".grid-container",
+                start: "top 80%",
+            },
+            y: 100,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power4.out"
+        });
+
+        // C. Hover Physics (Tilt Effect using Mouse movement)
+        const cards = document.querySelectorAll('.course-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Calculate rotation based on mouse position
+                const xPct = (x / rect.width) - 0.5;
+                const yPct = (y / rect.height) - 0.5;
+                
+                gsap.to(card, {
+                    rotationY: xPct * 10,
+                    rotationX: -yPct * 10,
+                    transformPerspective: 1000,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    rotationY: 0,
+                    rotationX: 0,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
