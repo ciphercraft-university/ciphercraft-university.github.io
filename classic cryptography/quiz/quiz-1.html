@@ -189,22 +189,26 @@
         }
 
         .progress-bar {
+            width: 100%;
+            height: 6px;
             background: var(--code-bg);
-            height: 8px;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            margin-top: 1rem;
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, var(--thm-red), var(--thm-blue));
             height: 100%;
+            background: linear-gradient(90deg, var(--thm-red) 0%, var(--thm-blue) 100%);
             transition: width 0.3s ease;
         }
 
-        /* --- Question Container --- */
+        /* --- Question Section --- */
         .question-container {
             padding: 2rem;
+        }
+
+        .question-content {
+            margin-bottom: 2rem;
         }
 
         .question-header {
@@ -216,73 +220,64 @@
 
         .question-number {
             font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
             color: var(--thm-red);
-            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
         }
 
         .difficulty-badge {
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
+            font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
         }
 
-        .difficulty-badge.easy {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            border: 1px solid #22c55e;
-        }
-
-        .difficulty-badge.medium {
+        .difficulty-badge {
             background: rgba(251, 191, 36, 0.1);
-            color: #fbbf24;
-            border: 1px solid #fbbf24;
-        }
-
-        .difficulty-badge.hard {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid #ef4444;
+            color: var(--accent-yellow);
+            border: 1px solid var(--accent-yellow);
         }
 
         .question-text {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
+            font-size: 1.1rem;
             color: var(--text-header);
-            line-height: 1.6;
+            line-height: 1.8;
+            margin-bottom: 2rem;
         }
 
         /* --- Options --- */
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 12px;
+            margin-bottom: 2rem;
         }
 
         .option-btn {
             background: rgba(15, 23, 42, 0.5);
-            border: 2px solid var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             padding: 1rem 1.5rem;
-            border-radius: 8px;
             color: var(--text-main);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: left;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
         }
 
         .option-btn:hover {
-            border-color: var(--thm-red);
             background: rgba(39, 201, 63, 0.05);
+            border-color: var(--thm-red);
             transform: translateX(4px);
         }
 
         .option-btn.selected {
-            border-color: var(--thm-red);
             background: var(--thm-red-dim);
+            border-color: var(--thm-red);
             color: var(--thm-red);
             font-weight: 600;
         }
@@ -290,8 +285,7 @@
         .checkbox-option {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            cursor: pointer;
+            gap: 12px;
         }
 
         .checkbox-option input[type="checkbox"] {
@@ -306,7 +300,7 @@
             flex: 1;
         }
 
-        /* --- True/False Buttons --- */
+        /* --- True/False Options --- */
         .truefalse-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -315,68 +309,72 @@
 
         .tf-btn {
             background: rgba(15, 23, 42, 0.5);
-            border: 2px solid var(--border-color);
-            padding: 2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
             text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
             font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
         }
 
-        .tf-btn.true:hover {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.1);
+        .tf-btn:hover {
+            transform: scale(1.02);
         }
 
-        .tf-btn.false:hover {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+        .tf-btn.true {
+            color: var(--thm-red);
         }
 
-        .tf-btn.selected.true {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
+        .tf-btn.true:hover,
+        .tf-btn.true.selected {
+            background: var(--thm-red-dim);
+            border-color: var(--thm-red);
         }
 
-        .tf-btn.selected.false {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+        .tf-btn.false {
             color: #ef4444;
         }
 
-        /* --- Question Navigation Dots --- */
+        .tf-btn.false:hover,
+        .tf-btn.false.selected {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        /* --- Question Dots Navigation --- */
         .question-dots {
             display: flex;
+            gap: 8px;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 2rem;
+            justify-content: center;
+            margin: 2rem 0;
             padding-top: 2rem;
             border-top: 1px solid var(--border-color);
         }
 
         .question-dot {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(15, 23, 42, 0.5);
             border: 2px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.5);
+            color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             font-family: 'JetBrains Mono', monospace;
-            font-weight: bold;
             font-size: 0.9rem;
+            font-weight: 600;
         }
 
         .question-dot:hover {
-            border-color: var(--thm-red);
             transform: scale(1.1);
+            border-color: var(--thm-red);
         }
 
         .question-dot.visited {
@@ -391,9 +389,9 @@
 
         .question-dot.current {
             background: var(--thm-red);
-            color: var(--bg-dark);
             border-color: var(--thm-red);
-            box-shadow: 0 0 15px var(--thm-red);
+            color: #fff;
+            box-shadow: 0 0 12px var(--thm-red);
         }
 
         /* --- Navigation Buttons --- */
@@ -401,42 +399,49 @@
             display: flex;
             justify-content: space-between;
             gap: 1rem;
-            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
         }
 
         .nav-btn {
+            padding: 0.75rem 2rem;
             background: var(--thm-red);
-            color: var(--bg-dark);
+            color: #fff;
             border: none;
-            padding: 1rem 2rem;
             border-radius: 6px;
-            font-weight: bold;
-            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .nav-btn:hover {
+        .nav-btn:hover:not(:disabled) {
+            background: #1fa832;
+            box-shadow: 0 0 20px rgba(39, 201, 63, 0.4);
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(39, 201, 63, 0.4);
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .nav-btn.secondary {
-            background: rgba(100, 116, 139, 0.2);
+            background: transparent;
+            border: 1px solid var(--border-color);
             color: var(--text-main);
         }
 
-        .nav-btn.secondary:hover {
-            background: rgba(100, 116, 139, 0.4);
+        .nav-btn.secondary:hover:not(:disabled) {
+            background: rgba(39, 201, 63, 0.05);
+            border-color: var(--thm-red);
+            color: var(--thm-red);
         }
 
-        /* --- Results --- */
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* --- Results Section --- */
         .results-container {
             padding: 3rem 2rem;
             text-align: center;
@@ -446,28 +451,30 @@
             display: inline-block;
             padding: 1rem 2rem;
             border-radius: 8px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 2rem 0;
             font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .result-badge.excellent {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            border: 2px solid #22c55e;
+            background: var(--thm-red-dim);
+            color: var(--thm-red);
+            border: 2px solid var(--thm-red);
         }
 
         .result-badge.good {
-            background: rgba(251, 191, 36, 0.1);
-            color: #fbbf24;
-            border: 2px solid #fbbf24;
+            background: rgba(5, 233, 241, 0.1);
+            color: var(--thm-blue);
+            border: 2px solid var(--thm-blue);
         }
 
         .result-badge.pass {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border: 2px solid #3b82f6;
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--accent-yellow);
+            border: 2px solid var(--accent-yellow);
         }
 
         .result-badge.fail {
@@ -477,16 +484,17 @@
         }
 
         .score-display {
-            font-size: 4rem;
-            font-weight: bold;
-            color: var(--thm-red);
             font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--text-header);
+            margin: 2rem 0;
         }
 
         .result-message {
             font-size: 1.2rem;
-            margin: 2rem 0;
             color: var(--text-main);
+            margin: 2rem 0;
         }
 
         .action-buttons {
@@ -497,44 +505,43 @@
             flex-wrap: wrap;
         }
 
-        /* --- Review --- */
+        /* --- Review Section --- */
         .review-container {
             padding: 2rem;
         }
 
         .review-header {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: 700;
             color: var(--text-header);
+            margin-bottom: 2rem;
             font-family: 'JetBrains Mono', monospace;
         }
 
         .review-item {
             background: rgba(15, 23, 42, 0.5);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             padding: 1.5rem;
             margin-bottom: 1rem;
         }
 
         .review-item.correct {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.05);
+            border-left: 4px solid var(--thm-red);
         }
 
         .review-item.incorrect {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.05);
+            border-left: 4px solid #ef4444;
         }
 
         .review-question {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: start;
             margin-bottom: 1rem;
             font-weight: 600;
             color: var(--text-header);
+            gap: 1rem;
         }
 
         .review-answer {
@@ -542,36 +549,53 @@
             padding: 0.5rem;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
         }
 
         .review-answer.correct {
-            color: #22c55e;
+            color: var(--thm-red);
         }
 
         .review-answer.incorrect {
             color: #ef4444;
         }
 
+        /* --- Animations --- */
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
         }
 
+        /* --- Responsive --- */
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
             }
 
-            .question-text {
-                font-size: 1.1rem;
+            .exam-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .truefalse-container {
+                grid-template-columns: 1fr;
             }
 
             .navigation {
                 flex-direction: column;
             }
 
-            .truefalse-container {
-                grid-template-columns: 1fr;
+            .nav-btn {
+                width: 100%;
+            }
+
+            .score-display {
+                font-size: 3rem;
             }
         }
     </style>
@@ -957,91 +981,93 @@
                         </div>
                         
                         <div className="question-container">
-                            <div className="question-header">
-                                <div className="question-number">
-                                    Question {currentQuestion + 1} of {questions.length}
-                                </div>
-                                <div className={`difficulty-badge ${q.difficulty}`}>
-                                    {q.difficulty}
-                                </div>
-                            </div>
-                            
-                            <div className="question-text">
-                                {q.question}
-                            </div>
-                            
-                            <div className="options-container">
-                                {q.type === 'single' && q.options.map((option, index) => (
-                                    <button
-                                        key={index}
-                                        className={`option-btn ${answers[currentQuestion] === option ? 'selected' : ''}`}
-                                        onClick={() => handleAnswer(option)}
-                                    >
-                                        {option}
-                                    </button>
-                                ))}
-                                
-                                {q.type === 'multiple' && q.options.map((option, index) => {
-                                    const isSelected = (answers[currentQuestion] || []).includes(option);
-                                    return (
-                                        <div key={index} className="option-btn checkbox-option">
-                                            <input
-                                                type="checkbox"
-                                                checked={isSelected}
-                                                onChange={() => handleMultipleAnswer(option)}
-                                                id={`option-${currentQuestion}-${index}`}
-                                            />
-                                            <label htmlFor={`option-${currentQuestion}-${index}`}>{option}</label>
-                                        </div>
-                                    );
-                                })}
-                                
-                                {q.type === 'truefalse' && (
-                                    <div className="truefalse-container">
-                                        <div 
-                                            className={`tf-btn true ${answers[currentQuestion] === 'True' ? 'selected' : ''}`}
-                                            onClick={() => handleAnswer('True')}
-                                        >
-                                            ✓ TRUE
-                                        </div>
-                                        <div 
-                                            className={`tf-btn false ${answers[currentQuestion] === 'False' ? 'selected' : ''}`}
-                                            onClick={() => handleAnswer('False')}
-                                        >
-                                            ✗ FALSE
-                                        </div>
+                            <div className="question-content">
+                                <div className="question-header">
+                                    <div className="question-number">
+                                        Question {currentQuestion + 1} of {questions.length}
                                     </div>
-                                )}
-                            </div>
-                            
-                            <div className="question-dots">
-                                {questions.map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className={`question-dot ${visitedQuestions.has(index) ? 'visited' : ''} ${answers[index] !== undefined ? 'answered' : ''} ${currentQuestion === index ? 'current' : ''}`}
-                                        onClick={() => goToQuestion(index)}
-                                    >
-                                        {index + 1}
+                                    <div className="difficulty-badge">
+                                        {q.difficulty.toUpperCase()}
                                     </div>
-                                ))}
+                                </div>
+                                
+                                <div className="question-text">
+                                    {q.question}
+                                </div>
+                                
+                                <div className="options-container">
+                                    {q.type === 'single' && q.options.map((option, index) => (
+                                        <button
+                                            key={index}
+                                            className={`option-btn ${answers[currentQuestion] === option ? 'selected' : ''}`}
+                                            onClick={() => handleAnswer(option)}
+                                        >
+                                            {option}
+                                        </button>
+                                    ))}
+                                    
+                                    {q.type === 'multiple' && q.options.map((option, index) => {
+                                        const isSelected = (answers[currentQuestion] || []).includes(option);
+                                        return (
+                                            <div key={index} className="option-btn checkbox-option">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleMultipleAnswer(option)}
+                                                    id={`option-${currentQuestion}-${index}`}
+                                                />
+                                                <label htmlFor={`option-${currentQuestion}-${index}`}>{option}</label>
+                                            </div>
+                                        );
+                                    })}
+                                    
+                                    {q.type === 'truefalse' && (
+                                        <div className="truefalse-container">
+                                            <div 
+                                                className={`tf-btn true ${answers[currentQuestion] === 'True' ? 'selected' : ''}`}
+                                                onClick={() => handleAnswer('True')}
+                                            >
+                                                ✓ TRUE
+                                            </div>
+                                            <div 
+                                                className={`tf-btn false ${answers[currentQuestion] === 'False' ? 'selected' : ''}`}
+                                                onClick={() => handleAnswer('False')}
+                                            >
+                                                ✗ FALSE
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="question-dots">
+                                    {questions.map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className={`question-dot ${visitedQuestions.has(index) ? 'visited' : ''} ${answers[index] !== undefined ? 'answered' : ''} ${currentQuestion === index ? 'current' : ''}`}
+                                            onClick={() => goToQuestion(index)}
+                                        >
+                                            {index + 1}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div className="navigation">
-                            <button
-                                className="nav-btn secondary"
-                                onClick={handlePreviousQuestion}
-                                disabled={currentQuestion === 0}
-                            >
-                                ← Previous
-                            </button>
                             
-                            <button
-                                className="nav-btn"
-                                onClick={handleNextQuestion}
-                            >
-                                {currentQuestion < questions.length - 1 ? 'Next Question →' : 'Submit Quiz'}
-                            </button>
+                            <div className="navigation">
+                                <button
+                                    className="nav-btn secondary"
+                                    onClick={handlePreviousQuestion}
+                                    disabled={currentQuestion === 0}
+                                >
+                                    ← Previous
+                                </button>
+                                
+                                <button
+                                    className="nav-btn"
+                                    onClick={handleNextQuestion}
+                                >
+                                    {currentQuestion < questions.length - 1 ? 'Next Question →' : 'Submit Quiz'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 );
