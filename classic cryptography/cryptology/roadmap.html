@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptology Roadmap | Ciphercraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --thm-red: #27c93f;
+            --thm-red-dim: #0076123b;
+            --thm-blue: #05e9f1;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #cbd5e1;
+            --text-header: #f8fafc;
+            --border-color: #334155;
+            --code-bg: #0f172a;
+            --accent-yellow: #fbbf24;
+            --accent-purple: #c084fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        a {
+            color: var(--thm-red);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--thm-red);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .module-info {
+            display: flex;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: var(--thm-red-dim);
+            color: var(--thm-red);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--thm-red);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .badge-blue {
+            background: rgba(5, 233, 241, 0.1);
+            color: var(--thm-blue);
+            border-color: var(--thm-blue);
+        }
+
+        .badge-purple {
+            background: rgba(192, 132, 252, 0.1);
+            color: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .meta-data {
+            color: #64748b;
+            padding: 4px 0;
+        }
+
+        h1 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        h2 {
+            color: var(--text-header);
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "##";
+            color: var(--thm-red);
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h3 {
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* --- Cards & Content --- */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .content-card:hover {
+            border-color: var(--thm-red);
+            transform: translateY(-2px);
+        }
+
+        /* --- Cryptology Tree Structure --- */
+        .cryptology-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .tree-node {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 1rem 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .tree-node:hover {
+            border-color: var(--thm-red);
+            transform: scale(1.02);
+        }
+
+        .tree-node.main {
+            border-color: var(--thm-blue);
+            background: linear-gradient(135deg, rgba(5, 233, 241, 0.05) 0%, rgba(30, 41, 59, 1) 100%);
+        }
+
+        .tree-node.primary {
+            border-color: var(--thm-red);
+            margin-left: 2rem;
+            width: calc(100% - 2rem);
+        }
+
+        .tree-node.secondary {
+            border-color: var(--accent-purple);
+            margin-left: 4rem;
+            width: calc(100% - 4rem);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .tree-connector {
+            position: absolute;
+            left: -2rem;
+            top: 50%;
+            width: 2rem;
+            height: 2px;
+            background: var(--border-color);
+        }
+
+        .node-title {
+            color: var(--thm-blue);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .node-title.red { color: var(--thm-red); }
+        .node-title.purple { color: var(--accent-purple); }
+
+        .primitive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 1rem;
+        }
+
+        .primitive-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+
+        .primitive-card:hover {
+            border-color: var(--thm-blue);
+            background: rgba(5, 233, 241, 0.05);
+        }
+
+        .primitive-card h4 {
+            color: var(--accent-yellow);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .primitive-card ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            font-size: 0.85rem;
+        }
+
+        .primitive-card li {
+            margin-bottom: 3px;
+            color: #94a3b8;
+        }
+
+        /* --- Roadmap Timeline --- */
+        .roadmap-phase {
+            margin: 3rem 0;
+            padding-left: 2rem;
+            border-left: 2px solid var(--thm-red);
+            position: relative;
+        }
+
+        .phase-marker {
+            position: absolute;
+            left: -12px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 3px solid var(--thm-red);
+        }
+
+        .phase-marker.blue { border-color: var(--thm-blue); }
+        .phase-marker.purple { border-color: var(--accent-purple); }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .phase-badge {
+            background: var(--thm-red-dim);
+            color: var(--thm-red);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .phase-badge.blue {
+            background: rgba(5, 233, 241, 0.1);
+            color: var(--thm-blue);
+        }
+
+        .phase-badge.purple {
+            background: rgba(192, 132, 252, 0.1);
+            color: var(--accent-purple);
+        }
+
+        /* --- Tables --- */
+        .cyber-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .cyber-table th {
+            background: rgba(255,255,255,0.05);
+            color: var(--thm-red);
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cyber-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            color: #fff;
+        }
+
+        .cyber-table tr:hover {
+            background: rgba(39, 201, 63, 0.05);
+        }
+
+        /* --- Terminal/Code Blocks --- */
+        .terminal {
+            background: var(--code-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #1e293b;
+            padding: 8px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-red { background: var(--thm-red); }
+        .dot-yellow { background: var(--accent-yellow); }
+        .dot-blue { background: var(--thm-blue); }
+        .terminal-title { margin-left: 10px; color: #94a3b8; font-size: 0.8rem; }
+
+        .code-content {
+            padding: 15px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .highlight-var { color: #7dd3fc; }
+        .highlight-str { color: #f0abfc; }
+        .highlight-key { color: var(--thm-red); }
+        .highlight-comment { color: #94a3b8; font-style: italic; }
+
+        /* --- Callouts --- */
+        .callout {
+            border-left: 3px solid var(--thm-red);
+            background: linear-gradient(90deg, rgba(39, 201, 63, 0.05) 0%, rgba(0,0,0,0) 100%);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .callout h4 {
+            color: var(--thm-red);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .callout-blue {
+            border-left-color: var(--thm-blue);
+            background: linear-gradient(90deg, rgba(5, 233, 241, 0.05) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .callout-blue h4 {
+            color: var(--thm-blue);
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .primitive-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tree-node.secondary {
+                margin-left: 2rem;
+                width: calc(100% - 2rem);
+            }
+            
+            .roadmap-phase {
+                padding-left: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="module-info">
+                <span class="badge">CRYPTOLOGY</span>
+                <span class="badge badge-blue">CRYPTOGRAPHY</span>
+                <span class="badge badge-purple">CRYPTANALYSIS</span>
+                <span class="badge">COMPREHENSIVE ROADMAP</span>
+                <span class="meta-data">Updated: Nov 2025</span>
+            </div>
+            <h1>Cryptology Roadmap</h1>
+            <p style="margin-top: 10px; color: #94a3b8; max-width: 800px;">The complete hierarchy of cryptographic primitives and the structured path to mastering cryptology: cryptography, cryptanalysis, and security protocols.</p>
+        </header>
+
+        <section>
+            <div class="content-card">
+                <h2>Understanding Cryptology</h2>
+                <p><strong>Cryptology</strong> is the overarching science of secure communication, comprising two main disciplines: <strong>cryptography</strong> (designing secure systems) and <strong>cryptanalysis</strong> (breaking secure systems). This roadmap follows the hierarchy of security primitives to build comprehensive expertise.</p>
+                
+                <div class="callout">
+                    <h4>Key Distinction</h4>
+                    <p><strong>Cryptography:</strong> "How to protect information" → Confidentiality, Integrity, Authentication<br>
+                    <strong>Cryptanalysis:</strong> "How to break protection" → Mathematical analysis, Side-channel attacks, Implementation flaws</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Cryptology Hierarchy</h2>
+            <p style="margin-bottom: 2rem;">The complete tree of cryptographic primitives and their relationships:</p>
+            
+            <!-- Main Cryptology Node -->
+             <center>
+            <div class="cryptology-tree">
+                <!-- Cryptography Branch -->
+                <div class="tree-connector"></div>
+                
+                <div class="tree-node primary">
+                    <div class="node-title red">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        CRYPTOGRAPHY (Design)
+                    </div>
+                    <p>The practice and study of techniques for secure communication.</p>
+                    
+                    <!-- Unkeyed Primitives -->
+                    <div class="tree-connector"></div>
+                    <div class="tree-node secondary">
+                        <div class="node-title purple">Unkeyed Primitives</div>
+                        <p>Cryptographic functions that don't require a secret key.</p>
+                        
+                        <div class="primitive-grid">
+                            <div class="primitive-card">
+                                <h4>Arbitrary Length Hash Functions</h4>
+                                <ul>
+                                    <li>SHA-256/512</li>
+                                    <li>SHA-3/Keccak</li>
+                                    <li>BLAKE2/3</li>
+                                    <li>MD5 (deprecated)</li>
+                                </ul>
+                            </div>
+                            <div class="primitive-card">
+                                <h4>One-way Permutations</h4>
+                                <ul>
+                                    <li>Trapdoor functions</li>
+                                    <li>Discrete log</li>
+                                    <li>Integer factorization</li>
+                                </ul>
+                            </div>
+                            <div class="primitive-card">
+                                <h4>Random Sequences</h4>
+                                <ul>
+                                    <li>PRNGs</li>
+                                    <li>CSPRNGs</li>
+                                    <li>Entropy sources</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Symmetric-key Primitives -->
+                    <div class="tree-connector"></div>
+                    <div class="tree-node secondary">
+                        <div class="node-title purple">Symmetric-key Primitives</div>
+                        <p>Algorithms using the same key for encryption and decryption.</p>
+                        
+                        <div class="primitive-grid">
+                            <div class="primitive-card">
+                                <h4>Block Ciphers</h4>
+                                <ul>
+                                    <li>AES (Rijndael)</li>
+                                    <li>DES/3DES</li>
+                                    <li>Blowfish</li>
+                                    <li>Twofish</li>
+                                </ul>
+                            </div>
+                            <div class="primitive-card">
+                                <h4>Stream Ciphers</h4>
+                                <ul>
+                                    <li>ChaCha20</li>
+                                    <li>RC4 (insecure)</li>
+                                    <li>Salsa20</li>
+                                </ul>
+                            </div>
+                            <div class="primitive-card">
+                                <h4>MAC & AEAD</h4>
+                                <ul>
+                                    <li>HMAC</li>
+                                    <li>Poly1305</li>
+                                    <li>AES-GCM</li>
+                                    <li>ChaCha20-Poly1305</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Public-key Primitives -->
+                    <div class="tree-connector"></div>
+                    <div class="tree-node secondary">
+                        <div class="node-title purple">Public-key Primitives</div>
+                        <p>Asymmetric algorithms using key pairs (public/private).</p>
+                        
+                        <div class="primitive-grid">
+                            <div class="primitive-card">
+                                <h4>Public-key Ciphers</h4>
+                                <ul>
+                                    <li>RSA</li>
+                                    <li>ElGamal</li>
+                                    <li>ECC-based</li>
+                                </ul>
+                            </div>
+                            <div class="primitive-card">
+                                <h4>Digital Signatures</h4>
+                                <ul>
+                                    <li>RSA-PSS</li>
+                                    <li>ECDSA</li>
+                                    <li>EdDSA</li>
+                                    <li>DSA</li>
+                                </ul>
+                            </div>
+                            <div class="primitive-card">
+                                <h4>Key Exchange</h4>
+                                <ul>
+                                    <li>Diffie-Hellman</li>
+                                    <li>ECDH</li>
+                                    <li>Post-quantum KEMs</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cryptanalysis Branch -->
+                <div class="tree-connector"></div>
+                <div class="tree-node primary">
+                    <div class="node-title red">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                        CRYPTANALYSIS (Attack)
+                    </div>
+                    <p>The study of analyzing and breaking cryptographic systems.</p>
+                    
+                    <div class="primitive-grid">
+                        <div class="primitive-card">
+                            <h4>Classical Attacks</h4>
+                            <ul>
+                                <li>Ciphertext-only</li>
+                                <li>Known-plaintext</li>
+                                <li>Chosen-plaintext</li>
+                                <li>Frequency analysis</li>
+                            </ul>
+                        </div>
+                        <div class="primitive-card">
+                            <h4>Modern Attacks</h4>
+                            <ul>
+                                <li>Side-channel</li>
+                                <li>Timing attacks</li>
+                                <li>Power analysis</li>
+                                <li>Fault injection</li>
+                            </ul>
+                        </div>
+                        <div class="primitive-card">
+                            <h4>Mathematical Attacks</h4>
+                            <ul>
+                                <li>Linear cryptanalysis</li>
+                                <li>Differential cryptanalysis</li>
+                                <li>Algebraic attacks</li>
+                                <li>Meet-in-the-middle</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </center>
+        
+        <section>
+            <h2>Learning Roadmap</h2>
+            <p style="margin-bottom: 2rem;">Structured learning path through the cryptology hierarchy:</p>
+            
+            <!-- Phase 1: Foundations -->
+            <div class="roadmap-phase">
+                <div class="phase-marker"></div>
+                <div class="phase-header">
+                    <span class="phase-badge">PHASE 1</span>
+                    <h3 style="margin: 0; color: var(--thm-red);">Mathematical Foundations</h3>
+                </div>
+                <p>Master the mathematical concepts underlying all cryptographic primitives.</p>
+                
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th width="30%">Topic</th>
+                            <th>Key Concepts</th>
+                            <th width="25%">Resources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Number Theory</strong></td>
+                            <td>Modular arithmetic, primes, gcd, Euler's theorem</td>
+                            <td>Khan Academy, "Elementary Number Theory"</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Abstract Algebra</strong></td>
+                            <td>Groups, rings, fields, finite fields GF(p)</td>
+                            <td>MIT OCW 18.701</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Probability & Stats</strong></td>
+                            <td>Random variables, entropy, distributions</td>
+                            <td>Coursera: Statistics</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Information Theory</strong></td>
+                            <td>Shannon entropy, perfect secrecy</td>
+                            <td>"Elements of Information Theory"</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-blue"></span>
+                        <span class="terminal-title">number_theory.py</span>
+                    </div>
+                    <div class="code-content">
+<span class="highlight-key">import</span> math
+<span class="highlight-key">import</span> random
+
+<span class="highlight-comment"># Modular arithmetic basics</span>
+<span class="highlight-key">def</span> <span class="highlight-var">mod_inverse</span>(a, m):
+    <span class="highlight-comment"># Extended Euclidean Algorithm</span>
+    <span class="highlight-key">def</span> <span class="highlight-var">egcd</span>(a, b):
+        <span class="highlight-key">if</span> b == <span class="highlight-key">0</span>:
+            <span class="highlight-key">return</span> (a, <span class="highlight-key">1</span>, <span class="highlight-key">0</span>)
+        g, x1, y1 = egcd(b, a % b)
+        <span class="highlight-key">return</span> (g, y1, x1 - (a // b) * y1)
+    
+    g, x, _ = egcd(a, m)
+    <span class="highlight-key">if</span> g != <span class="highlight-key">1</span>:
+        <span class="highlight-key">raise</span> ValueError(<span class="highlight-str">"No modular inverse exists"</span>)
+    <span class="highlight-key">return</span> x % m
+
+<span class="highlight-comment"># Example: RSA key generation math</span>
+<span class="highlight-key">def</span> <span class="highlight-var">generate_rsa_primes</span>(bits=<span class="highlight-key">512</span>):
+    <span class="highlight-comment"># In reality, use proper primality testing</span>
+    p = random.getrandbits(bits)
+    q = random.getrandbits(bits)
+    <span class="highlight-key">return</span> p, q
+
+<span class="highlight-comment"># Euler's totient function φ(n)</span>
+<span class="highlight-key">def</span> <span class="highlight-var">euler_totient</span>(p, q):
+    <span class="highlight-key">return</span> (p - <span class="highlight-key">1</span>) * (q - <span class="highlight-key">1</span>)
+
+print(<span class="highlight-str">"Modular inverse of 7 mod 26:"</span>, mod_inverse(<span class="highlight-key">7</span>, <span class="highlight-key">26</span>))</div>
+                </div>
+            </div>
+            
+            <!-- Phase 2: Symmetric Cryptography -->
+            <div class="roadmap-phase">
+                <div class="phase-marker blue"></div>
+                <div class="phase-header">
+                    <span class="phase-badge blue">PHASE 2</span>
+                    <h3 style="margin: 0; color: var(--thm-blue);">Symmetric Cryptography</h3>
+                </div>
+                <p>Master block ciphers, stream ciphers, and hash functions.</p>
+                
+                <div class="primitive-grid">
+                    <div class="primitive-card">
+                        <h4>AES Deep Dive</h4>
+                        <ul>
+                            <li>SubBytes transformation</li>
+                            <li>ShiftRows & MixColumns</li>
+                            <li>Key expansion</li>
+                            <li>Modes: ECB, CBC, CTR, GCM</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Hash Functions</h4>
+                        <ul>
+                            <li>Merkle-Damgård construction</li>
+                            <li>SHA-2 family</li>
+                            <li>SHA-3 (Keccak)</li>
+                            <li>HMAC construction</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Practical Implementation</h4>
+                        <ul>
+                            <li>Python cryptography lib</li>
+                            <li>OpenSSL CLI</li>
+                            <li>CTR vs CBC usage</li>
+                            <li>Authenticated encryption</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="callout callout-blue">
+                    <h4>Core Project: Build a Cryptography Library</h4>
+                    <p>Implement AES-128 from scratch (educational purposes only). Then use a production library like cryptography.io to implement secure file encryption with AES-256-GCM and Argon2 key derivation.</p>
+                </div>
+            </div>
+            
+            <!-- Phase 3: Asymmetric Cryptography -->
+            <div class="roadmap-phase">
+                <div class="phase-marker"></div>
+                <div class="phase-header">
+                    <span class="phase-badge">PHASE 3</span>
+                    <h3 style="margin: 0; color: var(--thm-red);">Asymmetric Cryptography</h3>
+                </div>
+                <p>Understand RSA, Elliptic Curve Cryptography, and key exchange protocols.</p>
+                
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th width="25%">Algorithm Family</th>
+                            <th>Mathematical Problem</th>
+                            <th width="20%">Security Level</th>
+                            <th width="25%">Common Uses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>RSA</strong></td>
+                            <td>Integer Factorization (IFP)</td>
+                            <td>2048-bit = 112-bit security</td>
+                            <td>TLS, PGP, SSH</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Diffie-Hellman</strong></td>
+                            <td>Discrete Logarithm (DLP)</td>
+                            <td>2048-bit = 112-bit security</td>
+                            <td>Key exchange</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Elliptic Curve</strong></td>
+                            <td>EC Discrete Logarithm (ECDLP)</td>
+                            <td>256-bit = 128-bit security</td>
+                            <td>Bitcoin, TLS 1.3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Post-Quantum</strong></td>
+                            <td>Lattice, Code-based problems</td>
+                            <td>Varies (ongoing NIST comp)</td>
+                            <td>Future-proofing</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-blue"></span>
+                        <span class="terminal-title">rsa_implementation.py</span>
+                    </div>
+                    <div class="code-content">
+<span class="highlight-key">from</span> cryptography.hazmat.primitives.asymmetric <span class="highlight-key">import</span> rsa, padding
+<span class="highlight-key">from</span> cryptography.hazmat.primitives <span class="highlight-key">import</span> hashes
+
+<span class="highlight-comment"># Generate RSA key pair</span>
+private_key = rsa.generate_private_key(
+    public_exponent=<span class="highlight-key">65537</span>,
+    key_size=<span class="highlight-key">2048</span>
+)
+public_key = private_key.public_key()
+
+<span class="highlight-comment"># Encrypt with public key</span>
+message = <span class="highlight-str">b"Secret message for RSA"</span>
+ciphertext = public_key.encrypt(
+    message,
+    padding.OAEP(
+        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+        algorithm=hashes.SHA256(),
+        label=<span class="highlight-key">None</span>
+    )
+)
+
+<span class="highlight-comment"># Decrypt with private key</span>
+plaintext = private_key.decrypt(
+    ciphertext,
+    padding.OAEP(
+        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+        algorithm=hashes.SHA256(),
+        label=<span class="highlight-key">None</span>
+    )
+)
+
+print(<span class="highlight-str">f"Original: {message.decode()}"</span>)
+print(<span class="highlight-str">f"Ciphertext (hex): {ciphertext.hex()[:50]}..."</span>)
+print(<span class="highlight-str">f"Decrypted: {plaintext.decode()}"</span>)</div>
+                </div>
+            </div>
+            
+            <!-- Phase 4: Cryptanalysis -->
+            <div class="roadmap-phase">
+                <div class="phase-marker purple"></div>
+                <div class="phase-header">
+                    <span class="phase-badge purple">PHASE 4</span>
+                    <h3 style="margin: 0; color: var(--accent-purple);">Cryptanalysis & Attacks</h3>
+                </div>
+                <p>Learn to break cryptographic systems through mathematical and side-channel attacks.</p>
+                
+                <div class="primitive-grid">
+                    <div class="primitive-card">
+                        <h4>Classical Cryptanalysis</h4>
+                        <ul>
+                            <li>Frequency analysis (Caesar, Vigenère)</li>
+                            <li>Kasiski examination</li>
+                            <li>Index of coincidence</li>
+                            <li>Known-plaintext attacks</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Modern Cryptanalysis</h4>
+                        <ul>
+                            <li>Linear cryptanalysis (DES)</li>
+                            <li>Differential cryptanalysis</li>
+                            <li>Biclique attacks (AES)</li>
+                            <li>Related-key attacks</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Side-Channel Attacks</h4>
+                        <ul>
+                            <li>Timing attacks (RSA)</li>
+                            <li>Power analysis (DPA/SPA)</li>
+                            <li>Cache attacks</li>
+                            <li>Electromagnetic analysis</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="callout" style="border-left-color: var(--accent-purple); background: linear-gradient(90deg, rgba(192, 132, 252, 0.05) 0%, rgba(0,0,0,0) 100%);">
+                    <h4 style="color: var(--accent-purple);">CTF Practice Path</h4>
+                    <p>1. <strong>picoCTF:</strong> Basic crypto challenges<br>
+                    2. <strong>CryptoHack:</strong> Progressive crypto learning<br>
+                    3. <strong>OverTheWire Krypton:</strong> Classical cipher breaking<br>
+                    4. <strong>HackTheBox:</strong> Real-world crypto implementations<br>
+                    5. <strong>DEFCON Quals:</strong> Advanced cryptanalysis</p>
+                </div>
+            </div>
+            
+            <!-- Phase 5: Protocols & Applications -->
+            <div class="roadmap-phase">
+                <div class="phase-marker blue"></div>
+                <div class="phase-header">
+                    <span class="phase-badge blue">PHASE 5</span>
+                    <h3 style="margin: 0; color: var(--thm-blue);">Protocols & Real-World Applications</h3>
+                </div>
+                <p>Apply cryptographic primitives in security protocols and systems.</p>
+                
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th width="25%">Protocol</th>
+                            <th>Cryptographic Components</th>
+                            <th width="30%">Security Properties</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>TLS 1.3</strong></td>
+                            <td>ECDHE, AES-GCM, ChaCha20-Poly1305, RSA signatures</td>
+                            <td>Forward secrecy, authenticated encryption</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SSH</strong></td>
+                            <td>Diffie-Hellman, HMAC-SHA2, AES-CTR</td>
+                            <td>Secure remote access, MITM protection</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PGP/GPG</strong></td>
+                            <td>RSA, ECC, AES, SHA-2</td>
+                            <td>Email encryption, digital signatures</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Blockchain</strong></td>
+                            <td>ECDSA, SHA-256, Merkle trees</td>
+                            <td>Transaction integrity, consensus</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signal Protocol</strong></td>
+                            <td>X3DH, Double Ratchet, AES-256</td>
+                            <td>Forward secrecy, post-compromise security</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <div class="content-card">
+                <h2>Advanced & Emerging Topics</h2>
+                <p>Cutting-edge areas in cryptology for advanced study:</p>
+                
+                <div class="primitive-grid">
+                    <div class="primitive-card">
+                        <h4>Post-Quantum Cryptography</h4>
+                        <ul>
+                            <li>Lattice-based (Kyber, Dilithium)</li>
+                            <li>Code-based (McEliece)</li>
+                            <li>Hash-based (SPHINCS+)</li>
+                            <li>Multivariate cryptography</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Zero-Knowledge Proofs</h4>
+                        <ul>
+                            <li>zk-SNARKs/STARKs</li>
+                            <li>Bulletproofs</li>
+                            <li>Sigma protocols</li>
+                            <li>Applications: Zcash, Tornado Cash</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Secure Multi-Party Computation</h4>
+                        <ul>
+                            <li>Garbled circuits</li>
+                            <li>Secret sharing</li>
+                            <li>Oblivious transfer</li>
+                            <li>Private set intersection</li>
+                        </ul>
+                    </div>
+                    <div class="primitive-card">
+                        <h4>Homomorphic Encryption</h4>
+                        <ul>
+                            <li>FHE (Fully Homomorphic)</li>
+                            <li>SHE (Somewhat Homomorphic)</li>
+                            <li>BFV, BGV, CKKS schemes</li>
+                            <li>Privacy-preserving ML</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="content-card">
+                <h2>Learning Progression Timeline</h2>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-blue"></span>
+                        <span class="terminal-title">learning_path.sh</span>
+                    </div>
+                    <div class="code-content">
+<span class="highlight-comment"># Year 1: Foundations & Symmetric Crypto</span>
+Months 1-3: Mathematics (Number Theory, Algebra)
+Months 4-6: Classical Ciphers & Cryptanalysis
+Months 7-9: Symmetric Cryptography (AES, Hash functions)
+Months 10-12: Programming Crypto Implementations
+
+<span class="highlight-comment"># Year 2: Asymmetric Crypto & Protocols</span>
+Months 1-3: Public-key Cryptography (RSA, ECC)
+Months 4-6: Digital Signatures & PKI
+Months 7-9: Network Security Protocols (TLS, SSH)
+Months 10-12: Cryptanalysis & CTF Challenges
+
+<span class="highlight-comment"># Year 3: Specialization</span>
+Choose 2-3 from:
+- Blockchain & Cryptocurrency Security
+- Post-Quantum Cryptography
+- Privacy-Enhancing Technologies
+- Hardware Security & Side-channels
+- Cryptographic Protocol Design
+
+<span class="highlight-comment"># Continuous Learning</span>
+- Read latest cryptographic papers (IACR conferences)
+- Contribute to open-source crypto projects
+- Participate in CTF competitions
+- Follow NIST post-quantum standardization</div>
+                </div>
+                
+                <div class="callout" style="margin-top: 2rem;">
+                    <h4>Assessment Checkpoints</h4>
+                    <p><strong>Beginner:</strong> Solve all CryptoHack introductory challenges<br>
+                    <strong>Intermediate:</strong> Complete Cryptopals sets 1-6<br>
+                    <strong>Advanced:</strong> Solve DEFCON crypto challenges<br>
+                    <strong>Expert:</strong> Contribute to cryptographic research or find novel vulnerabilities</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="logo-area">
+                <span style="font-family: 'JetBrains Mono'; font-weight: bold; color: #fff;">Ciphercraft Cryptology Roadmap</span>
+                <span style="color: var(--border-color);">|</span>
+                <span style="color: var(--thm-red);"><a href="https://cryptohack.org">CryptoHack</a></span>
+                <span style="color: var(--border-color);">|</span>
+                <span style="color: var(--thm-blue);"><a href="https://www.cryptopals.com">Cryptopals</a></span>
+            </div>
+            <p>Based on the cryptographic primitives hierarchy. Updated with NIST standards and current research.</p>
+            <p>&copy; 2025 Ciphercraft - Cryptology Roadmap v2.1</p>
+        </footer>
+    </div>
+
+    <script>
+        // Interactive tree nodes
+        document.querySelectorAll('.tree-node').forEach(node => {
+            node.addEventListener('click', function(e) {
+                if (!e.target.matches('a') && !e.target.matches('button') && !e.target.matches('input')) {
+                    const wasActive = this.classList.contains('active');
+                    
+                    // Remove active from all nodes
+                    document.querySelectorAll('.tree-node').forEach(n => {
+                        n.classList.remove('active');
+                        n.style.transform = '';
+                    });
+                    
+                    // Toggle active on clicked node
+                    if (!wasActive) {
+                        this.classList.add('active');
+                        this.style.transform = 'scale(1.03)';
+                        this.style.boxShadow = '0 8px 32px rgba(39, 201, 63, 0.2)';
+                        
+                        // Scroll to node if on mobile
+                        if (window.innerWidth < 768) {
+                            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }
+            });
+        });
+
+        // Phase tracking
+        const phases = document.querySelectorAll('.roadmap-phase');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const marker = entry.target.querySelector('.phase-marker');
+                    if (marker) {
+                        marker.style.animation = 'pulse 1s';
+                        setTimeout(() => {
+                            marker.style.animation = '';
+                        }, 1000);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        phases.forEach(phase => observer.observe(phase));
+
+        // Print roadmap functionality
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                alert('📄 Consider saving this roadmap as a PDF for your cryptology studies!\n\nRecommended: Print to PDF with "Background graphics" enabled.');
+            }
+        });
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.3); }
+            }
+            
+            .tree-node.active {
+                transition: all 0.3s ease;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+</body>
+</html>
