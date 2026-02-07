@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classical Cryptography Quiz | Classical Foundations and Terminology</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --thm-red: #27c93f;
+            --thm-red-dim: #0076123b;
+            --thm-blue: #05e9f1;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #cbd5e1;
+            --text-header: #f8fafc;
+            --border-color: #334155;
+            --code-bg: #0f172a;
+            --accent-yellow: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(39, 201, 63, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(5, 233, 241, 0.05) 0%, transparent 20%);
+        }
+
+        a {
+            color: var(--thm-red);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--thm-red);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .module-info {
+            display: flex;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: var(--thm-red-dim);
+            color: var(--thm-red);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--thm-red);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .meta-data {
+            color: #64748b;
+            padding: 4px 0;
+        }
+
+        h1 {
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        h2 {
+            color: var(--text-header);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "##";
+            color: var(--thm-red);
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h3 {
+            color: #fff;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* --- Exam Container --- */
+        .exam-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .exam-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--thm-red) 0%, var(--thm-blue) 100%);
+        }
+
+        /* --- Exam Header --- */
+        .exam-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .exam-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--thm-red);
+            padding: 8px 16px;
+            background: var(--thm-red-dim);
+            border-radius: 4px;
+            border: 1px solid var(--thm-red);
+        }
+
+        .timer.warning {
+            animation: pulse 1s infinite;
+            color: #fbbf24;
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .progress-info {
+            text-align: center;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .progress-info strong {
+            color: var(--text-header);
+        }
+
+        .progress-bar {
+            background: var(--code-bg);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--thm-red), var(--thm-blue));
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* --- Question Container --- */
+        .question-container {
+            padding: 2rem;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--thm-red);
+            font-weight: bold;
+        }
+
+        .difficulty-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .difficulty-badge.easy {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .difficulty-badge.medium {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
+        }
+
+        .difficulty-badge.hard {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: var(--text-header);
+            line-height: 1.6;
+        }
+
+        /* --- Options --- */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-btn {
+            background: rgba(15, 23, 42, 0.5);
+            border: 2px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--thm-red);
+            background: rgba(39, 201, 63, 0.05);
+            transform: translateX(4px);
+        }
+
+        .option-btn.selected {
+            border-color: var(--thm-red);
+            background: var(--thm-red-dim);
+            color: var(--thm-red);
+            font-weight: 600;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--thm-red);
+        }
+
+        .checkbox-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* --- True/False Buttons --- */
+        .truefalse-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .tf-btn {
+            background: rgba(15, 23, 42, 0.5);
+            border: 2px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tf-btn.true:hover {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .tf-btn.false:hover {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .tf-btn.selected.true {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .tf-btn.selected.false {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        /* --- Question Navigation Dots --- */
+        .question-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .question-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .question-dot:hover {
+            border-color: var(--thm-red);
+            transform: scale(1.1);
+        }
+
+        .question-dot.visited {
+            background: rgba(100, 116, 139, 0.2);
+        }
+
+        .question-dot.answered {
+            background: var(--thm-red-dim);
+            border-color: var(--thm-red);
+            color: var(--thm-red);
+        }
+
+        .question-dot.current {
+            background: var(--thm-red);
+            color: var(--bg-dark);
+            border-color: var(--thm-red);
+            box-shadow: 0 0 15px var(--thm-red);
+        }
+
+        /* --- Navigation Buttons --- */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .nav-btn {
+            background: var(--thm-red);
+            color: var(--bg-dark);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(39, 201, 63, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.secondary {
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--text-main);
+        }
+
+        .nav-btn.secondary:hover {
+            background: rgba(100, 116, 139, 0.4);
+        }
+
+        /* --- Results --- */
+        .results-container {
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 2rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-badge.excellent {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 2px solid #22c55e;
+        }
+
+        .result-badge.good {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            border: 2px solid #fbbf24;
+        }
+
+        .result-badge.pass {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .result-badge.fail {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--thm-red);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            color: var(--text-main);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* --- Review --- */
+        .review-container {
+            padding: 2rem;
+        }
+
+        .review-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .review-item {
+            background: rgba(15, 23, 42, 0.5);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-item.correct {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .review-item.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .review-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--text-header);
+        }
+
+        .review-answer {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .review-answer.correct {
+            color: #22c55e;
+        }
+
+        .review-answer.incorrect {
+            color: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .truefalse-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="width: 100%;">
+                <div class="module-info">
+                    <span class="badge">Quiz</span>
+                    <span class="meta-data">20 Questions • 15 Minutes</span>
+                </div>
+                <h1>Classical Foundations and Terminology</h1>
+            </div>
+        </header>
+
+        <div id="exam-app"></div>
+
+        <footer style="text-align: center; padding: 2rem 0; border-top: 1px solid var(--border-color); margin-top: 3rem; color: #64748b; font-size: 0.9rem;">
+            <p>© 2026 CipherCraft • Classical Cryptography Quiz</p>
+        </footer>
+    </div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function ExamApp() {
+            const questions = [
+                {
+                    question: "What is the Caesar cipher?",
+                    options: [
+                        "A transposition cipher that rearranges letters",
+                        "A substitution cipher that shifts letters by a fixed number",
+                        "A polyalphabetic cipher using multiple alphabets",
+                        "A cipher that encrypts pairs of letters"
+                    ],
+                    correctAnswer: "A substitution cipher that shifts letters by a fixed number",
+                    type: "single",
+                    difficulty: "easy"
+                },
+                {
+                    question: "Which of the following are classical cipher types? (Select all that apply)",
+                    options: [
+                        "Substitution ciphers",
+                        "Transposition ciphers",
+                        "Block ciphers",
+                        "Stream ciphers"
+                    ],
+                    correctAnswer: ["Substitution ciphers", "Transposition ciphers"],
+                    type: "multiple",
+                    difficulty: "medium"
+                },
+                {
+                    question: "The Vigenère cipher is a monoalphabetic substitution cipher.",
+                    options: ["True", "False"],
+                    correctAnswer: "False",
+                    type: "truefalse",
+                    difficulty: "easy"
+                },
+                {
+                    question: "What technique did Friedrich Kasiski develop to break the Vigenère cipher?",
+                    options: [
+                        "Frequency analysis of individual letters",
+                        "Finding repeated sequences to determine key length",
+                        "Brute force testing of all possible keys",
+                        "Using known plaintext attacks"
+                    ],
+                    correctAnswer: "Finding repeated sequences to determine key length",
+                    type: "single",
+                    difficulty: "medium"
+                },
+                {
+                    question: "Which of the following are examples of substitution ciphers? (Select all that apply)",
+                    options: [
+                        "Caesar cipher",
+                        "Playfair cipher",
+                        "Rail fence cipher",
+                        "Atbash cipher",
+                        "Columnar transposition"
+                    ],
+                    correctAnswer: ["Caesar cipher", "Playfair cipher", "Atbash cipher"],
+                    type: "multiple",
+                    difficulty: "medium"
+                },
+                {
+                    question: "In cryptographic terminology, 'plaintext' refers to the encrypted message.",
+                    options: ["True", "False"],
+                    correctAnswer: "False",
+                    type: "truefalse",
+                    difficulty: "easy"
+                },
+                {
+                    question: "What does 'cryptanalysis' mean?",
+                    options: [
+                        "The process of creating cryptographic systems",
+                        "The study of breaking cryptographic systems",
+                        "The mathematical analysis of prime numbers",
+                        "The implementation of encryption algorithms"
+                    ],
+                    correctAnswer: "The study of breaking cryptographic systems",
+                    type: "single",
+                    difficulty: "easy"
+                },
+                {
+                    question: "Which of the following are components of a cipher system? (Select all that apply)",
+                    options: [
+                        "Plaintext",
+                        "Ciphertext",
+                        "Key",
+                        "Algorithm",
+                        "Hash value"
+                    ],
+                    correctAnswer: ["Plaintext", "Ciphertext", "Key", "Algorithm"],
+                    type: "multiple",
+                    difficulty: "medium"
+                },
+                {
+                    question: "The Playfair cipher encrypts pairs of letters (digraphs) rather than single letters.",
+                    options: ["True", "False"],
+                    correctAnswer: "True",
+                    type: "truefalse",
+                    difficulty: "medium"
+                },
+                {
+                    question: "What is steganography?",
+                    options: [
+                        "A method of encrypting messages using mathematical functions",
+                        "The practice of hiding messages within other non-secret content",
+                        "A frequency analysis technique",
+                        "A type of transposition cipher"
+                    ],
+                    correctAnswer: "The practice of hiding messages within other non-secret content",
+                    type: "single",
+                    difficulty: "easy"
+                },
+                {
+                    question: "In a transposition cipher, what is changed?",
+                    options: [
+                        "The letters are replaced with different letters",
+                        "The order or position of letters is rearranged",
+                        "The letters are converted to numbers",
+                        "The letters are removed from the message"
+                    ],
+                    correctAnswer: "The order or position of letters is rearranged",
+                    type: "single",
+                    difficulty: "easy"
+                },
+                {
+                    question: "Which of the following terms describe types of cryptanalytic attacks? (Select all that apply)",
+                    options: [
+                        "Ciphertext-only attack",
+                        "Known-plaintext attack",
+                        "Chosen-plaintext attack",
+                        "Brute-force attack",
+                        "Substitution attack"
+                    ],
+                    correctAnswer: ["Ciphertext-only attack", "Known-plaintext attack", "Chosen-plaintext attack", "Brute-force attack"],
+                    type: "multiple",
+                    difficulty: "hard"
+                },
+                {
+                    question: "The Enigma machine was a rotor-based cipher machine used during World War II.",
+                    options: ["True", "False"],
+                    correctAnswer: "True",
+                    type: "truefalse",
+                    difficulty: "easy"
+                },
+                {
+                    question: "What is the 'key space' of a cipher?",
+                    options: [
+                        "The physical location where keys are stored",
+                        "The total number of possible keys",
+                        "The length of the encryption key in bytes",
+                        "The algorithm used to generate keys"
+                    ],
+                    correctAnswer: "The total number of possible keys",
+                    type: "single",
+                    difficulty: "medium"
+                },
+                {
+                    question: "Which statements about frequency analysis are correct? (Select all that apply)",
+                    options: [
+                        "It exploits the uneven distribution of letters in natural language",
+                        "It is effective against simple substitution ciphers",
+                        "It becomes less effective with shorter messages",
+                        "It can break any encryption system"
+                    ],
+                    correctAnswer: ["It exploits the uneven distribution of letters in natural language", "It is effective against simple substitution ciphers", "It becomes less effective with shorter messages"],
+                    type: "multiple",
+                    difficulty: "hard"
+                },
+                {
+                    question: "A one-time pad is theoretically unbreakable if used correctly.",
+                    options: ["True", "False"],
+                    correctAnswer: "True",
+                    type: "truefalse",
+                    difficulty: "medium"
+                },
+                {
+                    question: "What is a 'polyalphabetic cipher'?",
+                    options: [
+                        "A cipher that uses only Greek letters",
+                        "A cipher that uses multiple substitution alphabets",
+                        "A cipher that encrypts multiple messages at once",
+                        "A cipher that requires multiple keys"
+                    ],
+                    correctAnswer: "A cipher that uses multiple substitution alphabets",
+                    type: "single",
+                    difficulty: "medium"
+                },
+                {
+                    question: "Which of the following were historical encryption devices? (Select all that apply)",
+                    options: [
+                        "Scytale",
+                        "Enigma machine",
+                        "Caesar disk",
+                        "RSA algorithm",
+                        "Jefferson disk"
+                    ],
+                    correctAnswer: ["Scytale", "Enigma machine", "Caesar disk", "Jefferson disk"],
+                    type: "multiple",
+                    difficulty: "hard"
+                },
+                {
+                    question: "Kerckhoffs's principle states that a cipher should remain secure even if everything about the system, except the key, is public knowledge.",
+                    options: ["True", "False"],
+                    correctAnswer: "True",
+                    type: "truefalse",
+                    difficulty: "medium"
+                },
+                {
+                    question: "What does 'security through obscurity' mean?",
+                    options: [
+                        "Relying on the secrecy of the system's design rather than the key",
+                        "Using multiple layers of encryption",
+                        "Hiding encrypted messages in plain sight",
+                        "Using complex mathematical algorithms"
+                    ],
+                    correctAnswer: "Relying on the secrecy of the system's design rather than the key",
+                    type: "single",
+                    difficulty: "medium"
+                }
+            ];
+
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+            const [score, setScore] = useState(null);
+            const [showReview, setShowReview] = useState(false);
+            const [visitedQuestions, setVisitedQuestions] = useState(new Set([0]));
+
+            useEffect(() => {
+                if (score !== null) return;
+
+                const timer = setInterval(() => {
+                    setTimeLeft(prev => {
+                        if (prev <= 1) {
+                            clearInterval(timer);
+                            handleSubmit();
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+
+                return () => clearInterval(timer);
+            }, [score]);
+
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const handleAnswer = (answer) => {
+                setAnswers(prev => ({ ...prev, [currentQuestion]: answer }));
+            };
+
+            const handleMultipleAnswer = (option) => {
+                setAnswers(prev => {
+                    const currentAnswers = prev[currentQuestion] || [];
+                    const newAnswers = currentAnswers.includes(option)
+                        ? currentAnswers.filter(a => a !== option)
+                        : [...currentAnswers, option];
+                    return { ...prev, [currentQuestion]: newAnswers };
+                });
+            };
+
+            const handleNextQuestion = () => {
+                if (currentQuestion < questions.length - 1) {
+                    const nextQuestion = currentQuestion + 1;
+                    setCurrentQuestion(nextQuestion);
+                    setVisitedQuestions(prev => new Set([...prev, nextQuestion]));
+                } else {
+                    handleSubmit();
+                }
+            };
+
+            const handlePreviousQuestion = () => {
+                if (currentQuestion > 0) {
+                    const prevQuestion = currentQuestion - 1;
+                    setCurrentQuestion(prevQuestion);
+                    setVisitedQuestions(prev => new Set([...prev, prevQuestion]));
+                }
+            };
+
+            const goToQuestion = (index) => {
+                setCurrentQuestion(index);
+                setVisitedQuestions(prev => new Set([...prev, index]));
+            };
+
+            const isAnswerCorrect = (questionIndex) => {
+                const question = questions[questionIndex];
+                const userAnswer = answers[questionIndex];
+                
+                if (question.type === 'multiple') {
+                    if (!userAnswer || !Array.isArray(userAnswer)) return false;
+                    const sortedUser = [...userAnswer].sort();
+                    const sortedCorrect = [...question.correctAnswer].sort();
+                    return sortedUser.length === sortedCorrect.length &&
+                           sortedUser.every((val, idx) => val === sortedCorrect[idx]);
+                }
+                
+                return userAnswer === question.correctAnswer;
+            };
+
+            const handleSubmit = () => {
+                let correct = 0;
+                questions.forEach((_, index) => {
+                    if (isAnswerCorrect(index)) correct++;
+                });
+                
+                const percentage = (correct / questions.length) * 100;
+                setScore(percentage);
+            };
+
+            const resetExam = () => {
+                setCurrentQuestion(0);
+                setAnswers({});
+                setTimeLeft(15 * 60);
+                setScore(null);
+                setShowReview(false);
+                setVisitedQuestions(new Set([0]));
+            };
+
+            const getResultBadge = (score) => {
+                if (score >= 90) return { text: "EXCELLENT", class: "excellent" };
+                if (score >= 80) return { text: "VERY GOOD", class: "good" };
+                if (score >= 70) return { text: "PASS", class: "pass" };
+                return { text: "NEEDS IMPROVEMENT", class: "fail" };
+            };
+
+            const getScoreMessage = (score) => {
+                if (score >= 90) return "Outstanding! You have a strong grasp of classical cryptography foundations.";
+                if (score >= 80) return "Great job! You understand most classical cryptography concepts well.";
+                if (score >= 70) return "Good work! You have a solid understanding of the basics.";
+                return "Keep studying! Review the classical cryptography materials and try again.";
+            };
+
+            const renderQuestion = () => {
+                const q = questions[currentQuestion];
+                const answeredCount = Object.keys(answers).length;
+                const progress = (answeredCount / questions.length) * 100;
+
+                return (
+                    <div className="exam-container">
+                        <div className="exam-header">
+                            <div className="exam-stats">
+                                <div className={`timer ${timeLeft <= 120 ? 'warning' : ''}`}>
+                                    ⏱ {formatTime(timeLeft)}
+                                </div>
+                                <div className="progress-info">
+                                    <strong>{answeredCount}</strong> / {questions.length} answered
+                                </div>
+                            </div>
+                            <div className="progress-bar">
+                                <div className="progress-fill" style={{width: `${progress}%`}}></div>
+                            </div>
+                        </div>
+                        
+                        <div className="question-container">
+                            <div className="question-header">
+                                <div className="question-number">
+                                    Question {currentQuestion + 1} of {questions.length}
+                                </div>
+                                <div className={`difficulty-badge ${q.difficulty}`}>
+                                    {q.difficulty}
+                                </div>
+                            </div>
+                            
+                            <div className="question-text">
+                                {q.question}
+                            </div>
+                            
+                            <div className="options-container">
+                                {q.type === 'single' && q.options.map((option, index) => (
+                                    <button
+                                        key={index}
+                                        className={`option-btn ${answers[currentQuestion] === option ? 'selected' : ''}`}
+                                        onClick={() => handleAnswer(option)}
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                                
+                                {q.type === 'multiple' && q.options.map((option, index) => {
+                                    const isSelected = (answers[currentQuestion] || []).includes(option);
+                                    return (
+                                        <div key={index} className="option-btn checkbox-option">
+                                            <input
+                                                type="checkbox"
+                                                checked={isSelected}
+                                                onChange={() => handleMultipleAnswer(option)}
+                                                id={`option-${currentQuestion}-${index}`}
+                                            />
+                                            <label htmlFor={`option-${currentQuestion}-${index}`}>{option}</label>
+                                        </div>
+                                    );
+                                })}
+                                
+                                {q.type === 'truefalse' && (
+                                    <div className="truefalse-container">
+                                        <div 
+                                            className={`tf-btn true ${answers[currentQuestion] === 'True' ? 'selected' : ''}`}
+                                            onClick={() => handleAnswer('True')}
+                                        >
+                                            ✓ TRUE
+                                        </div>
+                                        <div 
+                                            className={`tf-btn false ${answers[currentQuestion] === 'False' ? 'selected' : ''}`}
+                                            onClick={() => handleAnswer('False')}
+                                        >
+                                            ✗ FALSE
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="question-dots">
+                                {questions.map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className={`question-dot ${visitedQuestions.has(index) ? 'visited' : ''} ${answers[index] !== undefined ? 'answered' : ''} ${currentQuestion === index ? 'current' : ''}`}
+                                        onClick={() => goToQuestion(index)}
+                                    >
+                                        {index + 1}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="navigation">
+                            <button
+                                className="nav-btn secondary"
+                                onClick={handlePreviousQuestion}
+                                disabled={currentQuestion === 0}
+                            >
+                                ← Previous
+                            </button>
+                            
+                            <button
+                                className="nav-btn"
+                                onClick={handleNextQuestion}
+                            >
+                                {currentQuestion < questions.length - 1 ? 'Next Question →' : 'Submit Quiz'}
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderResults = () => {
+                if (showReview) {
+                    return (
+                        <div className="exam-container">
+                            <div className="review-container">
+                                <div className="review-header">Quiz Review</div>
+                                
+                                {questions.map((q, index) => {
+                                    const isCorrect = isAnswerCorrect(index);
+                                    const userAnswer = answers[index];
+                                    
+                                    return (
+                                        <div key={index} className={`review-item ${isCorrect ? 'correct' : 'incorrect'}`}>
+                                            <div className="review-question">
+                                                <span>Q{index + 1}: {q.question}</span>
+                                                <span className="difficulty-badge">{q.difficulty.toUpperCase()}</span>
+                                            </div>
+                                            
+                                            <div className="review-answer">
+                                                <strong>Your answer:</strong>{' '}
+                                                {q.type === 'single' || q.type === 'truefalse' ? userAnswer || 'Not answered' : 
+                                                 q.type === 'multiple' ? (userAnswer ? userAnswer.join(', ') : 'Not answered') : ''}
+                                            </div>
+                                            
+                                            <div className={`review-answer ${isCorrect ? 'correct' : 'incorrect'}`}>
+                                                <strong>Correct answer:</strong>{' '}
+                                                {q.type === 'single' || q.type === 'truefalse' ? q.correctAnswer : 
+                                                 q.type === 'multiple' ? q.correctAnswer.join(', ') : ''}
+                                            </div>
+                                            
+                                            <div style={{marginTop: '0.5rem', color: isCorrect ? 'var(--thm-red)' : '#ef4444', fontFamily: "'JetBrains Mono', monospace"}}>
+                                                {isCorrect ? '✓ CORRECT' : '✗ INCORRECT'}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                
+                                <div className="action-buttons">
+                                    <button className="nav-btn" onClick={() => setShowReview(false)}>
+                                        ← Back to Results
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+                
+                const badge = getResultBadge(score);
+                
+                return (
+                    <div className="exam-container">
+                        <div className="results-container">
+                            <h2>Quiz Completed!</h2>
+                            
+                            <div className={`result-badge ${badge.class}`}>
+                                {badge.text}
+                            </div>
+                            
+                            <div className="score-display">
+                                {score.toFixed(1)}%
+                            </div>
+                            
+                            <p className="result-message">
+                                {getScoreMessage(score)}
+                            </p>
+                            
+                            <div className="progress-bar" style={{maxWidth: '300px', margin: '2rem auto'}}>
+                                <div className="progress-fill" style={{width: `${score}%`}}></div>
+                            </div>
+                            
+                            <div className="action-buttons">
+                                <button className="nav-btn" onClick={() => setShowReview(true)}>
+                                    📋 Review Answers
+                                </button>
+                                <button className="nav-btn secondary" onClick={resetExam}>
+                                    🔄 Retake Quiz
+                                </button>
+                            </div>
+                            
+                            <div style={{marginTop: '3rem', padding: '1.5rem', background: 'rgba(15, 23, 42, 0.5)', borderRadius: '6px', border: '1px solid var(--border-color)'}}>
+                                <div style={{color: '#94a3b8', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.9rem'}}>
+                                    <strong>Performance:</strong> {score >= 90 ? 
+                                        <span style={{color: 'var(--thm-red)'}}> MASTERY LEVEL</span> : 
+                                        score >= 70 ?
+                                        <span style={{color: '#fbbf24'}}> PROFICIENT</span> :
+                                        <span style={{color: '#ef4444'}}> NEEDS REVIEW</span>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <>
+                    {score === null ? renderQuestion() : renderResults()}
+                </>
+            );
+        }
+
+        ReactDOM.render(<ExamApp />, document.getElementById('exam-app'));
+    </script>
+</body>
+</html>
