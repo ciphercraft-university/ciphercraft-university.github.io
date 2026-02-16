@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Visualization | CipherCraft v2</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --htb-green: #9fef00;
+            --htb-green-dim: rgba(159, 239, 0, 0.1);
+            --bg-dark: #0b121f;
+            --bg-card: #111927;
+            --text-main: #b6b7bb;
+            --text-header: #ffffff;
+            --border-color: #2b3b55;
+            --code-bg: #1a2332;
+            --accent-blue: #3967ff;
+            --highlight: #f0f;
+            --grid-gap: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CRT Scanline Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* UI Container */
+        .terminal-window {
+            width: 90vw;
+            max-width: 1000px;
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(159, 239, 0, 0.1);
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status { 
+            opacity: 0.7; 
+            color: var(--htb-green);
+        }
+
+        /* The Visualization Stage */
+        .stage {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: relative;
+            min-height: 400px;
+        }
+
+        /* Alphabet Rows */
+        .alphabet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .row-label {
+            font-size: 1rem;
+            color: var(--htb-green);
+            margin-bottom: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .char-row {
+            display: flex;
+            gap: 2px;
+            position: relative;
+            overflow: hidden;
+            height: 35px;
+        }
+
+        .char-box {
+            border: 1px solid var(--border-color);
+            min-width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            position: relative;
+            background: var(--code-bg);
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+            flex-shrink: 0;
+        }
+
+        .char-box.active {
+            background: var(--htb-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--htb-green);
+            z-index: 10;
+            border-color: var(--htb-green);
+        }
+
+        .char-box.target {
+            border-color: var(--highlight);
+            color: var(--highlight);
+            box-shadow: 0 0 8px var(--highlight);
+        }
+
+        /* The Shift Indicator */
+        .shift-info {
+            position: absolute;
+            right: 0;
+            top: -40px;
+            color: var(--htb-green);
+            font-size: 1.2rem;
+            opacity: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        #shift-val {
+            margin-left: 8px;
+            padding: 2px 8px;
+            background: var(--htb-green-dim);
+            border: 1px solid var(--htb-green);
+            border-radius: 4px;
+        }
+
+        /* Encryption Workspace */
+        .workspace {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .word-process {
+            display: flex;
+            gap: 10px;
+            font-size: 3rem;
+        }
+
+        .letter-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60px;
+        }
+
+        .arrow-down {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            opacity: 0;
+            color: var(--border-color);
+        }
+
+        .encrypted-char {
+            color: var(--highlight);
+            opacity: 0;
+        }
+
+        /* Math Log Side Panel */
+        .log-panel {
+            width: 300px;
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+            padding-left: 20px;
+            height: 150px;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0;
+            background: rgba(17, 25, 39, 0.5);
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 2px;
+        }
+
+        .log-highlight { color: var(--htb-green); }
+
+        /* Connector Line (SVG) */
+        #connector-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            overflow: visible;
+        }
+        
+        path.connector {
+            fill: none;
+            stroke: var(--htb-green);
+            stroke-width: 2;
+            stroke-dasharray: 10 5;
+        }
+
+        /* Start Button Overlay */
+        #startOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 18, 31, 0.95);
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .config-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(159, 239, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .config-panel h2 {
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .config-panel p {
+            color: var(--text-main);
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        #shiftInput {
+            width: 100%;
+            padding: 15px;
+            background: var(--code-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-header);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            text-align: center;
+            border-radius: 4px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #shiftInput:focus {
+            border-color: var(--htb-green);
+            box-shadow: 0 0 10px var(--htb-green-dim);
+        }
+
+        .range-display {
+            color: var(--text-main);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .start-btn {
+            padding: 15px 50px;
+            background: var(--htb-green);
+            color: #000;
+            border: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(159, 239, 0, 0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .start-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .hint {
+            color: var(--text-main);
+            opacity: 0.6;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Circular shift indicator */
+        .shift-visual {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            height: 80px;
+            border: 2px dashed var(--htb-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0;
+        }
+
+        .shift-arrow {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            font-size: 1.5rem;
+            color: var(--htb-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Configuration Overlay -->
+    <div id="startOverlay">
+        <div class="config-panel">
+            <h2>⚙ CIPHER CONFIGURATION</h2>
+            <p>Configure your Caesar cipher shift value</p>
+            
+            <div class="input-group">
+                <label for="shiftInput">SHIFT KEY:</label>
+                <input type="number" id="shiftInput" value="3" min="1" max="25" />
+                <div class="range-display">Valid range: 1-25</div>
+            </div>
+
+            <button class="start-btn" id="startBtn">
+                START ENCRYPTION
+            </button>
+
+            <div class="hint">Press ENTER or click the button to begin</div>
+        </div>
+    </div>
+
+    <div class="terminal-window">
+        <header>
+            <div class="title">🔐 CAESAR CIPHER</div>
+            <div class="status">STATUS: <span id="status-text">IDLE</span></div>
+        </header>
+
+        <div class="stage">
+            <svg id="connector-svg"></svg>
+
+            <!-- Alphabet Visualization Section -->
+            <div class="alphabet-container">
+                <div style="position: relative;">
+                    <div class="row-label">PLAINTEXT ALPHABET</div>
+                    <div class="char-row" id="plain-row"></div>
+                </div>
+
+                <div style="position: relative;">
+                    <div class="row-label">CIPHER ALPHABET (SHIFTED)</div>
+                    <div class="shift-info">
+                        SHIFT: <span id="shift-val">?</span>
+                    </div>
+                    <div class="shift-visual" id="shiftVisual">
+                        <span id="shiftCircleVal">0</span>
+                        <div class="shift-arrow">↻</div>
+                    </div>
+                    <div class="char-row" id="cipher-row"></div>
+                </div>
+            </div>
+
+            <!-- Encryption Workspace -->
+            <div class="workspace">
+                <div class="word-process" id="word-container"></div>
+                <div class="log-panel" id="log-panel">
+                    <div style="color: var(--htb-green)">// ENCRYPTION LOG</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GSAP & Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Flip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(Flip, TextPlugin);
+
+        // --- CONFIGURATION ---
+        const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        const WORD_TO_ENCRYPT = "HACK"; 
+        let SHIFT_AMOUNT = 3; // Will be set by user input
+        
+        // --- STATE ---
+        let animationTimeline = null;
+        let isAnimating = false;
+        const svgNamespace = "http://www.w3.org/2000/svg";
+
+        // --- DOM REFERENCES ---
+        const plainRow = document.getElementById('plain-row');
+        const cipherRow = document.getElementById('cipher-row');
+        const wordContainer = document.getElementById('word-container');
+        const logPanel = document.getElementById('log-panel');
+        const shiftInput = document.getElementById('shiftInput');
+        const startBtn = document.getElementById('startBtn');
+        const startOverlay = document.getElementById('startOverlay');
+
+        // --- BUILD THE UI ---
+        function buildUI() {
+            // Create plaintext alphabet
+            plainRow.innerHTML = '';
+            ALPHABET.forEach(char => {
+                const box = document.createElement('div');
+                box.className = 'char-box plain-box';
+                box.innerText = char;
+                plainRow.appendChild(box);
+            });
+
+            // Create cipher alphabet (initially same as plaintext)
+            cipherRow.innerHTML = '';
+            ALPHABET.forEach((char, i) => {
+                const box = document.createElement('div');
+                box.className = 'char-box cipher-box';
+                box.innerText = char;
+                box.dataset.originalIndex = i;
+                cipherRow.appendChild(box);
+            });
+
+            // Create word slots
+            wordContainer.innerHTML = '';
+            WORD_TO_ENCRYPT.split("").forEach(char => {
+                const slot = document.createElement('div');
+                slot.className = 'letter-slot';
+                slot.innerHTML = `
+                    <div class="plain-char" style="color: var(--htb-green); font-family: 'JetBrains Mono', monospace;">${char}</div>
+                    <div class="arrow-down">↓</div>
+                    <div class="encrypted-char" style="font-family: 'JetBrains Mono', monospace;">?</div>
+                `;
+                wordContainer.appendChild(slot);
+            });
+        }
+
+        // --- START ANIMATION ---
+        function startAnimation() {
+            if (isAnimating) return;
+            
+            // Get shift value from input
+            SHIFT_AMOUNT = parseInt(shiftInput.value);
+            if (isNaN(SHIFT_AMOUNT) || SHIFT_AMOUNT < 1 || SHIFT_AMOUNT > 25) {
+                alert('Please enter a valid shift value between 1 and 25');
+                return;
+            }
+            
+            isAnimating = true;
+            startOverlay.style.display = 'none';
+            
+            // Reset previous animation
+            if (animationTimeline) {
+                animationTimeline.kill();
+            }
+            
+            // Clear previous lines
+            document.getElementById('connector-svg').innerHTML = '';
+            
+            // Reset UI elements
+            const allCharBoxes = document.querySelectorAll('.char-box');
+            allCharBoxes.forEach(box => {
+                box.className = 'char-box ' + (box.classList.contains('plain-box') ? 'plain-box' : 'cipher-box');
+            });
+            
+            document.querySelectorAll('.encrypted-char').forEach(el => {
+                el.textContent = '?';
+                el.style.opacity = '0';
+            });
+            
+            document.querySelectorAll('.arrow-down').forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            // Clear log panel
+            logPanel.innerHTML = '<div style="color: var(--htb-green)">// ENCRYPTION LOG</div>';
+            
+            // Create new timeline
+            animationTimeline = gsap.timeline({
+                onComplete: () => {
+                    isAnimating = false;
+                }
+            });
+
+            // 1. UI Boot Sequence
+            animationTimeline.to("#status-text", { 
+                text: "INITIALIZING...",
+                duration: 0.5 
+            })
+            .to(".char-box", {
+                opacity: 1,
+                scale: 1,
+                stagger: { amount: 0.5, from: "random" },
+                duration: 0.5,
+                ease: "power1.out"
+            })
+            .to("#status-text", { 
+                text: "AWAITING KEY...",
+                duration: 0.3 
+            });
+
+            // 2. Show shift value with circular indicator
+            animationTimeline.addLabel("shiftStart")
+            .to(".shift-info", { opacity: 1, duration: 0.5 })
+            .to("#shift-val", {
+                text: String(SHIFT_AMOUNT),
+                duration: 0.8,
+                onStart: () => {
+                    document.getElementById("status-text").innerText = "APPLYING SHIFT";
+                }
+            }, "shiftStart+=0.3")
+            .to("#shiftVisual", {
+                opacity: 1,
+                duration: 0.5
+            }, "shiftStart+=0.3")
+            .to("#shiftCircleVal", {
+                text: String(SHIFT_AMOUNT),
+                duration: 0.8
+            }, "shiftStart+=0.3")
+            .to("#shiftVisual", {
+                rotation: 360,
+                duration: 1.5,
+                ease: "power2.inOut"
+            }, "shiftStart+=0.5");
+
+            // 3. Animate the alphabet shift using smooth translation
+            animationTimeline.call(() => {
+                const cipherBoxes = Array.from(document.querySelectorAll('.cipher-box'));
+                const containerWidth = cipherRow.offsetWidth;
+                const boxWidth = cipherBoxes[0].offsetWidth + 2; // including gap
+                
+                // Calculate shift distance
+                const shiftDistance = -boxWidth * SHIFT_AMOUNT;
+                
+                // Animate all boxes sliding left
+                gsap.to(cipherBoxes, {
+                    x: shiftDistance,
+                    duration: 1.5,
+                    ease: "power2.inOut",
+                    stagger: 0.02,
+                    onComplete: () => {
+                        // After animation, physically reorder DOM and reset positions
+                        for(let i = 0; i < SHIFT_AMOUNT; i++) {
+                            const firstBox = cipherRow.firstElementChild;
+                            cipherRow.appendChild(firstBox);
+                        }
+                        
+                        // Reset transforms
+                        gsap.set(cipherBoxes, { x: 0 });
+                    }
+                });
+                
+                // Highlight the shifted letters during animation
+                gsap.to(cipherBoxes.slice(0, SHIFT_AMOUNT), {
+                    backgroundColor: "rgba(159, 239, 0, 0.3)",
+                    scale: 1.1,
+                    duration: 0.3,
+                    delay: 0.5,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power1.inOut"
+                });
+                
+            }, null, "shiftStart+=1");
+
+            animationTimeline.to("#status-text", { 
+                text: "PROCESSING INPUT",
+                duration: 0.5 
+            }, "+=1.5");
+
+            // 4. Reveal Log Panel
+            animationTimeline.to("#log-panel", { opacity: 1, duration: 0.5 });
+
+            // 5. Execute letter encryption steps automatically
+            const slots = document.querySelectorAll('.letter-slot');
+            slots.forEach((slot, index) => {
+                const char = WORD_TO_ENCRYPT[index];
+                const plainIndex = ALPHABET.indexOf(char);
+                const newIndex = (plainIndex + SHIFT_AMOUNT) % 26; 
+                const newChar = ALPHABET[newIndex];
+
+                const plainEl = plainRow.children[plainIndex];
+                const cipherBoxes = Array.from(cipherRow.children);
+                const cipherEl = cipherBoxes.find(el => el.innerText === newChar);
+
+                // A. Highlight Input
+                animationTimeline.to(slot.querySelector('.plain-char'), { 
+                    color: "#fff", 
+                    scale: 1.3, 
+                    duration: 0.2 
+                });
+                
+                // B. Highlight Plaintext Grid
+                animationTimeline.to(plainEl, { 
+                    backgroundColor: "#9fef00",
+                    color: "#000",
+                    boxShadow: "0 0 10px #9fef00",
+                    scale: 1.1,
+                    duration: 0.2 
+                }, "<");
+                
+                // C. Draw Connector Line
+                animationTimeline.call(() => drawLine(plainEl, cipherEl), null, ">");
+
+                // D. Log the Math
+                animationTimeline.call(() => addLogEntry(char, plainIndex, SHIFT_AMOUNT, newIndex, newChar), null, "<");
+                
+                // E. Highlight Cipher Grid
+                animationTimeline.to(cipherEl, { 
+                    borderColor: "#f0f",
+                    color: "#f0f",
+                    boxShadow: "0 0 8px #f0f",
+                    scale: 1.1,
+                    duration: 0.2 
+                }, "+=0.2");
+
+                // F. Reveal Output
+                animationTimeline.to(slot.querySelector('.arrow-down'), { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.2 
+                }, "+=0.1");
+                
+                animationTimeline.to(slot.querySelector('.encrypted-char'), { 
+                    opacity: 1,
+                    text: newChar,
+                    color: "#f0f",
+                    scale: 1.5,
+                    duration: 0.5 
+                }, "<");
+
+                // G. Cleanup highlights
+                animationTimeline.to(plainEl, { 
+                    backgroundColor: "#1a2332",
+                    color: "#b6b7bb",
+                    boxShadow: "none",
+                    scale: 1,
+                    duration: 0.2 
+                }, "+=0.4");
+                
+                animationTimeline.to(cipherEl, { 
+                    borderColor: "#2b3b55",
+                    color: "#b6b7bb",
+                    boxShadow: "none",
+                    scale: 1,
+                    duration: 0.2 
+                }, "<");
+                
+                animationTimeline.to(slot.querySelector('.plain-char'), { 
+                    color: "#9fef00", 
+                    scale: 1, 
+                    duration: 0.2 
+                }, "<");
+                
+                // Add small delay between letters
+                animationTimeline.to({}, { duration: 0.3 });
+            });
+
+            // 6. Final success message
+            animationTimeline.to("#status-text", { 
+                text: "ENCRYPTION COMPLETE",
+                color: "#f0f",
+                duration: 1 
+            });
+            
+            animationTimeline.to(".encrypted-char", {
+                textShadow: "0 0 10px #f0f",
+                repeat: -1,
+                yoyo: true,
+                duration: 1
+            });
+        }
+
+        // --- EVENT LISTENERS ---
+        startBtn.addEventListener('click', startAnimation);
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (!isAnimating && startOverlay.style.display !== "none") {
+                    startAnimation();
+                }
+            }
+        });
+
+        // Input validation
+        shiftInput.addEventListener('input', function() {
+            const val = parseInt(this.value);
+            if (val < 1) this.value = 1;
+            if (val > 25) this.value = 25;
+        });
+
+        // --- HELPER FUNCTIONS ---
+        function drawLine(startEl, endEl) {
+            const svg = document.getElementById('connector-svg');
+            const rect1 = startEl.getBoundingClientRect();
+            const rect2 = endEl.getBoundingClientRect();
+            const containerRect = document.querySelector('.stage').getBoundingClientRect();
+
+            const x1 = rect1.left + rect1.width / 2 - containerRect.left;
+            const y1 = rect1.bottom - containerRect.top;
+            const x2 = rect2.left + rect2.width / 2 - containerRect.left;
+            const y2 = rect2.top - containerRect.top;
+
+            const path = document.createElementNS(svgNamespace, "path");
+            path.setAttribute("d", `M ${x1} ${y1} V ${y1 + 10} L ${x2} ${y2 - 10} V ${y2}`);
+            path.setAttribute("class", "connector");
+            
+            svg.appendChild(path);
+
+            const length = path.getTotalLength();
+            gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+            gsap.to(path, { 
+                strokeDashoffset: 0, 
+                duration: 0.4, 
+                ease: "power2.inOut",
+                onComplete: () => {
+                    gsap.to(path, { opacity: 0, duration: 0.5, delay: 0.5, onComplete: () => path.remove() });
+                }
+            });
+        }
+
+        function addLogEntry(char, idx, shift, newIdx, result) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span style="color:var(--border-color)">In:</span> ${char}(${idx}) 
+                <span style="color:var(--htb-green)">+ ${shift}</span>
+                <br>
+                <span style="color:#555">(${idx} + ${shift}) % 26 = ${newIdx}</span>
+                <br>
+                <span style="color:#f0f">Out:</span> <span class="log-highlight">${result}</span>
+            `;
+            logPanel.prepend(entry);
+            
+            gsap.from(entry, { x: -20, opacity: 0, duration: 0.3 });
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', function() {
+            buildUI();
+            startOverlay.style.display = "flex";
+            document.getElementById("status-text").innerText = "IDLE";
+        });
+
+    </script>
+</body>
+</html>
